@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 import java.util.Map;
 
-public class MainClass {
+public class StringUnArchiver {
 
     public static void main(String[] args) {
         Map<String, String> tasksAndExpectations = Map.of(

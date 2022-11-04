@@ -1,23 +1,12 @@
 import java.util.Arrays;
 
-public class LeetCode {
+public class RemoveDuplicates {
 
     public static void main(String[] args) {
-//        isPalindrome
-//        for (int i : new int[]{121, -121, 10}) {
-//            System.out.println(i + " " + isPalindrome(i));
-//        }
-
-//        removeDuplicates
-//        int[] array = new int[]{0,0,1,1,1,2,2,3,3,4};
+        //        int[] array = new int[]{0,0,1,1,1,2,2,3,3,4};
         int[] array = new int[]{1,1,2};
         System.out.println(removeDuplicates(array));
         System.out.println(Arrays.toString(array));
-    }
-
-    public static boolean isPalindrome(int x) {
-        var asString = new StringBuilder().append(x);
-        return String.valueOf(x).equals(asString.reverse().toString());
     }
 
     public static int removeDuplicates(int[] array) {
@@ -34,7 +23,7 @@ public class LeetCode {
         return array.length - removedQuantity;
     }
 
-    public static void shift(int[] array, int index, int removedQty) {
+    private static void shift(int[] array, int index, int removedQty) {
         for (int i = index; i < array.length-1; i++) {
             array[i] = array[i+1];
         }

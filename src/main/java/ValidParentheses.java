@@ -11,10 +11,10 @@ public class ValidParentheses {
     }
 
     private static boolean isValid(String s) {
-        // this gave 'beats 57,6% for running time' and '37,54% for memory consumption' on leetcode
-
+// this gave 'beats 57,6% for running time' and '37,54% for memory consumption' on leetcode
 //        var stack = new LinkedList<Character>();
-        // this gave 'beats 90,71% for running time' and '57,01% for memory consumption' on leetcode
+
+// this gave 'beats 90,71% for running time' and '57,01% for memory consumption' on leetcode
         var stack = new ArrayDeque<Character>();
 
         for (char ch : s.toCharArray()) {

@@ -6,11 +6,15 @@ import java.util.stream.IntStream;
 
 public class IntervalsMerger {
     public static void main(String[] args) {
-        var intervals = new int[][]{{1, 6}, {5, 7}, {9, 10}, {8, 9}};
-        Arrays.stream(merge(intervals)).forEach(item -> System.out.println(Arrays.toString(item)));
+        for (int i = 0; i < 1000; i++) {
+            var intervals = new int[][]{{1, 6}, {5, 7}, {9, 10}, {8, 9}};
+            merge(intervals);
+//            Arrays.stream(merge(intervals)).forEach(item -> System.out.println(Arrays.toString(item)));
+        }
     }
 
     private static int[][] merge(int[][] intervals) {
+        long start = System.nanoTime();
         var sortedAsList = new LinkedList<Integer>();
         var sorted = Arrays.stream(intervals)
                 .sorted(Comparator.comparingInt(interval -> interval[0]))
@@ -18,16 +22,24 @@ public class IntervalsMerger {
                 .peek(sortedAsList::addLast)
                 .toArray();
 
-        System.out.println(sortedAsList);
+//        System.out.println(sortedAsList);
 
         boolean showMustGoOn = true;
         while (showMustGoOn) {
             showMustGoOn = false;
 
+            var iterator = sortedAsList.listIterator();
+            iterator.next();
             for (int i = 1; i < sortedAsList.size() - 1; i += 2) {
-                if (sortedAsList.get(i) >= sortedAsList.get(i + 1)) {
-                    sortedAsList.remove(i);
-                    sortedAsList.remove(i);
+                int current = iterator.next();
+                int next = iterator.next();
+                if (current >= next) {
+                    iterator.previous();
+                    iterator.remove();
+
+                    iterator.previous();
+                    iterator.remove();
+
                     showMustGoOn = true;
                 }
             }
@@ -38,6 +50,7 @@ public class IntervalsMerger {
             result[j] = new int[]{sortedAsList.get(i-1), sortedAsList.get(i)};
         }
 
+        System.out.println(System.nanoTime() - start);
         return result;
     }
 }

@@ -50,7 +50,7 @@ public class IntervalsMerger {
             result[j] = new int[]{sortedAsList.get(i-1), sortedAsList.get(i)};
         }
 
-        System.out.println(System.nanoTime() - start);
+//        System.out.println(System.nanoTime() - start);
         return result;
     }
 }

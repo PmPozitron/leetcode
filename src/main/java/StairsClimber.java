@@ -1,15 +1,16 @@
 import java.util.Map;
+import java.util.stream.IntStream;
 
 public class StairsClimber {
 
     public static void main(String[] args) {
         var tasksAndExpectedResults = Map.of(
-//                1,1,
-//          2,2,
-//          3,3,
-//                6, 13,
-//                7, 21,
-//                9, 55,
+                1,1,
+          2,2,
+          3,3,
+                6, 13,
+                7, 21,
+                9, 55,
                 44, 1134903170,
                 45, 1836311903
         );
@@ -44,6 +45,7 @@ public class StairsClimber {
     }
 
     // https://leetcode.com/problems/climbing-stairs/solutions/25345/easy-solutions-for-suggestions/comments/24409
+    // so it's just fibo sequence shifted one time so that we have 2 as result for input 2 while second fibo is 1
     public static int climbStairsNotMineSolution (int n) {
         int answer = 1;
         for(int i = 0, pre = 0; i < n; i++) pre = (answer += pre) - pre;

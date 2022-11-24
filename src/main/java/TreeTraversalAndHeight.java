@@ -129,21 +129,20 @@ public class TreeTraversalAndHeight {
     public static int startMinDepthRecursive(TreeNode root) {
         if (root == null) return 0;
 
-        AtomicInteger result = new AtomicInteger(Integer.MAX_VALUE);
-        minDepthRecursive(root, 1, result);
-        return result.get();
+        return minDepthRecursive(root, 1, Integer.MAX_VALUE);
     }
-    public static int minDepthRecursive(TreeNode current, int currentHeight, AtomicInteger currentMin) {
-        if (current == null) return currentMin.get();
+    public static int minDepthRecursive(TreeNode current, int currentHeight, int currentMin) {
+        if (current == null) return currentMin;
 
         if (current.left == null && current.right == null)
-            if (currentMin.get() > currentHeight)
-                currentMin.set(currentHeight);
+            if (currentMin > currentHeight)
+                currentMin = (currentHeight);
 
-        minDepthRecursive(current.left, currentHeight+1, currentMin);
-        minDepthRecursive(current.right, currentHeight+1, currentMin);
+        int left = minDepthRecursive(current.left, currentHeight+1, currentMin);
+        int right = minDepthRecursive(current.right, currentHeight+1, currentMin);
 
-        return currentMin.get();
+        if (left <= right) return left;
+        else return right;
     }
 }
 

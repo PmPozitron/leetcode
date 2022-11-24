@@ -94,23 +94,21 @@ public class InorderTreeTraversal {
     }
 
     public static int calculateTreeHeight(TreeNode root) {
-
         if (root == null) return 0;
 
-        TreeSet<Pair> visited = new TreeSet<>(Comparator.comparingInt(pair -> pair.height));
+        int maxHeight = 1;
         ArrayDeque<Pair> queue = new ArrayDeque<>();
-        Pair rootPair = new Pair(root, 0);
+        Pair rootPair = new Pair(root, maxHeight);
         queue.offer(rootPair);
-        visited.add(rootPair);
 
         while (!queue.isEmpty()) {
             Pair pair = queue.poll();
             if (pair.node.left != null) queue.offer(new Pair(pair.node.left, pair.height+1));
             if (pair.node.right != null) queue.offer(new Pair(pair.node.right, pair.height+1));
 
-            visited.add(pair);
+            if (maxHeight < pair.height) maxHeight = pair.height;
         }
-        return visited.last().height;
+        return maxHeight;
     }
 }
 

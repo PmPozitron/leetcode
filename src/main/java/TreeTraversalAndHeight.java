@@ -1,17 +1,13 @@
 import java.util.ArrayDeque;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class InorderTreeTraversal {
+public class TreeTraversalAndHeight {
     public static void main(String[] args) {
         TreeNode one = new TreeNode(3, new TreeNode(1), new TreeNode(2));
 
@@ -44,7 +40,7 @@ public class InorderTreeTraversal {
                         new TreeNode(), Collections.emptyList(),
                         new TreeNode(1), List.of(1)
                 ).entrySet().stream()
-                .forEach(item -> System.out.printf("for %s expected result is %s and actual is %s\n", item.getKey(), item.getValue(), calculateTreeHeight(item.getKey())));
+                .forEach(item -> System.out.printf("for %s expected result is %s and actual is %s\n", item.getKey(), item.getValue(), calculateMaxTreeHeight(item.getKey())));
     }
 
     public static List<Integer> inorderTraversal(TreeNode root) {
@@ -93,7 +89,7 @@ public class InorderTreeTraversal {
         return result;
     }
 
-    public static int calculateTreeHeight(TreeNode root) {
+    public static int calculateMaxTreeHeight(TreeNode root) {
         if (root == null) return 0;
 
         int maxHeight = 1;
@@ -109,6 +105,45 @@ public class InorderTreeTraversal {
             if (maxHeight < pair.height) maxHeight = pair.height;
         }
         return maxHeight;
+    }
+    public static int calculateMinTreeHeight(TreeNode root) {
+        if (root == null) return 0;
+
+        int minHeight = Integer.MAX_VALUE;
+        ArrayDeque<Pair> queue = new ArrayDeque<>();
+        Pair rootPair = new Pair(root, 1);
+        queue.offer(rootPair);
+
+        while (!queue.isEmpty()) {
+            Pair pair = queue.poll();
+            if (pair.node.left != null) queue.offer(new Pair(pair.node.left, pair.height+1));
+            if (pair.node.right != null) queue.offer(new Pair(pair.node.right, pair.height+1));
+
+            if (pair.node.left == null && pair.node.right == null) {
+                if (minHeight > pair.height) minHeight = pair.height;
+            }
+        }
+        return minHeight;
+    }
+
+    public static int startMinDepthRecursive(TreeNode root) {
+        if (root == null) return 0;
+
+        AtomicInteger result = new AtomicInteger(Integer.MAX_VALUE);
+        minDepthRecursive(root, 1, result);
+        return result.get();
+    }
+    public static int minDepthRecursive(TreeNode current, int currentHeight, AtomicInteger currentMin) {
+        if (current == null) return currentMin.get();
+
+        if (current.left == null && current.right == null)
+            if (currentMin.get() > currentHeight)
+                currentMin.set(currentHeight);
+
+        minDepthRecursive(current.left, currentHeight+1, currentMin);
+        minDepthRecursive(current.right, currentHeight+1, currentMin);
+
+        return currentMin.get();
     }
 }
 

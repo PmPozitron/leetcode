@@ -1,11 +1,15 @@
 import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class InorderTreeTraversal {
     public static void main(String[] args) {
@@ -31,16 +35,16 @@ public class InorderTreeTraversal {
         TreeNode sixteen = new TreeNode(3, fourteen, fifteen);
 
         Map.of(
-                sixteen, List.of(7,1,5,3,4,2,9),
-//                nine, List.of(1,3,2)
-//                        one, List.of(1, 3, 2)
-//                        three, List.of(1, 3, 2)
-//                        four, List.of(1, 2, 3)
-//                        eight, List.of(2, 4, 1, 3)
+                sixteen, List.of(7, 1, 5, 3, 4, 2, 9),
+                        nine, List.of(1,3,2),
+                        one, List.of(1, 3, 2),
+                        three, List.of(1, 3, 2),
+                        four, List.of(1, 2, 3),
+                        eight, List.of(2, 4, 1, 3),
                         new TreeNode(), Collections.emptyList(),
                         new TreeNode(1), List.of(1)
                 ).entrySet().stream()
-                .forEach(item -> System.out.printf("for %s expected result is %s and actual is %s\n", item.getKey(), item.getValue(), inorderTraversal(item.getKey())));
+                .forEach(item -> System.out.printf("for %s expected result is %s and actual is %s\n", item.getKey(), item.getValue(), calculateTreeHeight(item.getKey())));
     }
 
     public static List<Integer> inorderTraversal(TreeNode root) {
@@ -88,6 +92,26 @@ public class InorderTreeTraversal {
 
         return result;
     }
+
+    public static int calculateTreeHeight(TreeNode root) {
+
+        if (root == null) return 0;
+
+        TreeSet<Pair> visited = new TreeSet<>(Comparator.comparingInt(pair -> pair.height));
+        ArrayDeque<Pair> queue = new ArrayDeque<>();
+        Pair rootPair = new Pair(root, 0);
+        queue.offer(rootPair);
+        visited.add(rootPair);
+
+        while (!queue.isEmpty()) {
+            Pair pair = queue.poll();
+            if (pair.node.left != null) queue.offer(new Pair(pair.node.left, pair.height+1));
+            if (pair.node.right != null) queue.offer(new Pair(pair.node.right, pair.height+1));
+
+            visited.add(pair);
+        }
+        return visited.last().height;
+    }
 }
 
 class TreeNode {
@@ -106,5 +130,15 @@ class TreeNode {
         this.val = val;
         this.left = left;
         this.right = right;
+    }
+}
+
+class Pair {
+    TreeNode node;
+    Integer height;
+
+    public Pair(TreeNode node, Integer height) {
+        this.node = node;
+        this.height = height;
     }
 }

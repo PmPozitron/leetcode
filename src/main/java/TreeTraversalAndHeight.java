@@ -144,6 +144,29 @@ public class TreeTraversalAndHeight {
         if (left <= right) return left;
         else return right;
     }
+
+    public static boolean hasPathSum(TreeNode root, int targetSum) {
+        if (root == null) return false;
+
+        return hasPathSum(root, targetSum, root.val);
+    }
+
+    public static  boolean hasPathSum(TreeNode current, int targetSum, int currentSum) {
+        if (current == null) return false;
+
+        if (current.left == null && current.right == null)
+            return targetSum == currentSum;
+
+        else if (current.left == null)
+            return hasPathSum(current.right, targetSum, currentSum+current.right.val);
+
+        else if (current.right == null)
+            return hasPathSum(current.left, targetSum, currentSum+current.left.val);
+
+        else return hasPathSum(current.left, targetSum, currentSum+current.left.val) ||
+                    hasPathSum(current.right, targetSum, currentSum+current.right.val);
+
+    }
 }
 
 class TreeNode {

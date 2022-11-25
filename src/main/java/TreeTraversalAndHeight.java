@@ -4,11 +4,20 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TreeTraversalAndHeight {
     public static void main(String[] args) {
+        expectedResultsForTraversalTasks().entrySet().stream()
+                .forEach(item ->
+                        System.out.printf("for %s expected result is %s and actual is %s\n",
+                                item.getKey(), item.getValue(), calculateMaxTreeHeight(item.getKey())));
+    }
+
+    private static Map<TreeNode, List<Integer>> expectedResultsForTraversalTasks() {
+
         TreeNode one = new TreeNode(3, new TreeNode(1), new TreeNode(2));
 
         TreeNode two = new TreeNode(2);
@@ -30,17 +39,16 @@ public class TreeTraversalAndHeight {
         TreeNode fifteen = new TreeNode(2, twelve, thirteen);
         TreeNode sixteen = new TreeNode(3, fourteen, fifteen);
 
-        Map.of(
+        return Map.of(
                 sixteen, List.of(7, 1, 5, 3, 4, 2, 9),
-                        nine, List.of(1,3,2),
-                        one, List.of(1, 3, 2),
-                        three, List.of(1, 3, 2),
-                        four, List.of(1, 2, 3),
-                        eight, List.of(2, 4, 1, 3),
-                        new TreeNode(), Collections.emptyList(),
-                        new TreeNode(1), List.of(1)
-                ).entrySet().stream()
-                .forEach(item -> System.out.printf("for %s expected result is %s and actual is %s\n", item.getKey(), item.getValue(), calculateMaxTreeHeight(item.getKey())));
+                nine, List.of(1, 3, 2),
+                one, List.of(1, 3, 2),
+                three, List.of(1, 3, 2),
+                four, List.of(1, 2, 3),
+                eight, List.of(2, 4, 1, 3),
+                new TreeNode(), Collections.emptyList(),
+                new TreeNode(1), List.of(1)
+        );
     }
 
     public static List<Integer> inorderTraversal(TreeNode root) {
@@ -99,13 +107,14 @@ public class TreeTraversalAndHeight {
 
         while (!queue.isEmpty()) {
             Pair pair = queue.poll();
-            if (pair.node.left != null) queue.offer(new Pair(pair.node.left, pair.height+1));
-            if (pair.node.right != null) queue.offer(new Pair(pair.node.right, pair.height+1));
+            if (pair.node.left != null) queue.offer(new Pair(pair.node.left, pair.height + 1));
+            if (pair.node.right != null) queue.offer(new Pair(pair.node.right, pair.height + 1));
 
             if (maxHeight < pair.height) maxHeight = pair.height;
         }
         return maxHeight;
     }
+
     public static int calculateMinTreeHeight(TreeNode root) {
         if (root == null) return 0;
 
@@ -116,8 +125,8 @@ public class TreeTraversalAndHeight {
 
         while (!queue.isEmpty()) {
             Pair pair = queue.poll();
-            if (pair.node.left != null) queue.offer(new Pair(pair.node.left, pair.height+1));
-            if (pair.node.right != null) queue.offer(new Pair(pair.node.right, pair.height+1));
+            if (pair.node.left != null) queue.offer(new Pair(pair.node.left, pair.height + 1));
+            if (pair.node.right != null) queue.offer(new Pair(pair.node.right, pair.height + 1));
 
             if (pair.node.left == null && pair.node.right == null) {
                 if (minHeight > pair.height) minHeight = pair.height;
@@ -131,6 +140,7 @@ public class TreeTraversalAndHeight {
 
         return minDepthRecursive(root, 1, Integer.MAX_VALUE);
     }
+
     public static int minDepthRecursive(TreeNode current, int currentHeight, int currentMin) {
         if (current == null) return currentMin;
 
@@ -138,8 +148,8 @@ public class TreeTraversalAndHeight {
             if (currentMin > currentHeight)
                 currentMin = (currentHeight);
 
-        int left = minDepthRecursive(current.left, currentHeight+1, currentMin);
-        int right = minDepthRecursive(current.right, currentHeight+1, currentMin);
+        int left = minDepthRecursive(current.left, currentHeight + 1, currentMin);
+        int right = minDepthRecursive(current.right, currentHeight + 1, currentMin);
 
         if (left <= right) return left;
         else return right;
@@ -151,22 +161,162 @@ public class TreeTraversalAndHeight {
         return hasPathSum(root, targetSum, root.val);
     }
 
-    public static  boolean hasPathSum(TreeNode current, int targetSum, int currentSum) {
+    public static boolean hasPathSum(TreeNode current, int targetSum, int currentSum) {
         if (current == null) return false;
 
         if (current.left == null && current.right == null)
             return targetSum == currentSum;
 
         else if (current.left == null)
-            return hasPathSum(current.right, targetSum, currentSum+current.right.val);
+            return hasPathSum(current.right, targetSum, currentSum + current.right.val);
 
         else if (current.right == null)
-            return hasPathSum(current.left, targetSum, currentSum+current.left.val);
+            return hasPathSum(current.left, targetSum, currentSum + current.left.val);
 
-        else return hasPathSum(current.left, targetSum, currentSum+current.left.val) ||
-                    hasPathSum(current.right, targetSum, currentSum+current.right.val);
+        else return hasPathSum(current.left, targetSum, currentSum + current.left.val) ||
+                    hasPathSum(current.right, targetSum, currentSum + current.right.val);
 
     }
+
+    public static boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q != null) return false;
+        if (p != null && q == null) return false;
+        if (p == null && q == null) return true;
+
+        Queue<TreeNode> pQ = new ArrayDeque<>();
+        Queue<TreeNode> qQ = new ArrayDeque<>();
+        pQ.offer(p);
+        qQ.offer(q);
+
+        while (!pQ.isEmpty()) {
+            if (qQ.isEmpty()) return false;
+
+            TreeNode pNode = pQ.poll();
+            TreeNode qNode = qQ.poll();
+
+            if (!isSameNode(pNode, qNode)) return false;
+
+            if (pNode.left != null) pQ.offer(pNode.left);
+            if (pNode.right != null) pQ.offer(pNode.right);
+            if (qNode.left != null) qQ.offer(qNode.left);
+            if (qNode.right != null) qQ.offer(qNode.right);
+        }
+
+        if (!qQ.isEmpty()) return false;
+
+        return true;
+    }
+
+    private static boolean isSameNode(TreeNode p, TreeNode q) {
+        boolean pLeftPresent = false;
+        boolean pRightPresent = false;
+        boolean qLeftPresent = false;
+        boolean qRightPresent = false;
+
+        if (p.left != null) {
+            pLeftPresent = true;
+        }
+        if (p.right != null) {
+            pRightPresent = true;
+        }
+
+        if (q.left != null) {
+            qLeftPresent = true;
+        }
+        if (q.right != null) {
+            qRightPresent = true;
+        }
+
+        return (pLeftPresent == qLeftPresent) &&
+                (pRightPresent == qRightPresent) &&
+                (p.val == q.val);
+    }
+
+    public static boolean isSymmetricRecursive(TreeNode root) {
+        if (root == null) return false;
+
+        if (root.left == null && root.right != null) return false;
+        if (root.left != null && root.right == null) return false;
+        if (root.left == null && root.right == null) return true;
+
+        return isSymmetricRecursive(root.left, root.right);
+    }
+
+    private static boolean isSymmetricRecursive(TreeNode left, TreeNode right) {
+
+        if (left == null && right != null) return false;
+        if (left != null && right == null) return false;
+        if (left == null && right == null) return true;
+
+        if ((left.left == null) && (right.right != null)) return false;
+        if ((left.left != null) && (right.right == null)) return false;
+        if ((left.right == null) && (right.left != null)) return false;
+        if ((left.right != null) && (right.left == null)) return false;
+
+        if (!isSymmetricNode(left, right)) return false;
+
+        return isSymmetricRecursive(left.left, right.right) &&
+                isSymmetricRecursive(left.right, right.left);
+    }
+
+    public static boolean isSymmetric(TreeNode root) {
+        if (root == null) return false;
+
+        if (root.left == null && root.right != null) return false;
+        if (root.left != null && root.right == null) return false;
+        if (root.left == null && root.right == null) return true;
+
+        Queue<TreeNode> leftQueue = new ArrayDeque<>();
+        Queue<TreeNode> rightQueue = new ArrayDeque<>();
+
+        leftQueue.offer(root.left);
+        rightQueue.offer(root.right);
+
+        while (!leftQueue.isEmpty()) {
+            if (rightQueue.isEmpty()) return false;
+
+            TreeNode left = leftQueue.poll();
+            TreeNode right = rightQueue.poll();
+
+            if (!isSymmetricNode(left, right)) return false;
+
+            if (left.left != null) leftQueue.offer(left.left);
+            if (left.right != null) leftQueue.offer(left.right);
+
+            if (right.right != null) rightQueue.offer(right.right);
+            if (right.left != null) rightQueue.offer(right.left);
+        }
+
+        if (!rightQueue.isEmpty()) return false;
+
+        return true;
+    }
+
+    private static boolean isSymmetricNode(TreeNode p, TreeNode q) {
+        boolean pLeftPresent = false;
+        boolean pRightPresent = false;
+        boolean qLeftPresent = false;
+        boolean qRightPresent = false;
+
+        if (p.left != null) {
+            pLeftPresent = true;
+        }
+        if (p.right != null) {
+            pRightPresent = true;
+        }
+
+        if (q.left != null) {
+            qLeftPresent = true;
+        }
+        if (q.right != null) {
+            qRightPresent = true;
+        }
+
+        return (pLeftPresent == qRightPresent) &&
+                (pRightPresent == qLeftPresent) &&
+                (p.val == q.val);
+    }
+
 }
 
 class TreeNode {

@@ -10,12 +10,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TreeTraversalAndHeight {
     public static void main(String[] args) {
-        expectedResultsForTraversalTasks().entrySet().stream()
-                .forEach(item ->
-                        System.out.printf("for %s expected result is %s and actual is %s\n",
-                                item.getKey(), item.getValue(), calculateMaxTreeHeight(item.getKey())));
+//        expectedResultsForTraversalTasks().entrySet().stream()
+//                .forEach(item ->
+//                        System.out.printf("for %s expected result is %s and actual is %s\n",
+//                                item.getKey(), item.getValue(), calculateMaxTreeHeight(item.getKey())));
+
+        expectedResultsForArrayToBst().entrySet().stream()
+                .forEach((item -> System.out.printf("for %s expected result is %s and actual is %s\n",
+//                        item.getKey(), item.getValue(), sortedArrayToBST(new int[]{-10,-3,0,5,9}))));
+                        item.getKey(), item.getValue(), sortedArrayToBST(new int[]{0,1,2,3,4,5,6,7,8}))));
     }
 
+    private static Map<TreeNode, List<Integer>> expectedResultsForArrayToBst() {
+        TreeNode negativeThree = new TreeNode(-3, new TreeNode(-10), null);
+        TreeNode positiveFive = new TreeNode(5, null, new TreeNode(9));
+        return Map.of(new TreeNode(0, negativeThree, positiveFive), List.of(-10,-3,0,5,9));
+
+//        TreeNode one = new TreeNode(1, new TreeNode(0), new TreeNode(2));
+//        TreeNode five = new TreeNode(5, new TreeNode(4), null);
+//        return Map.of(new TreeNode(3, one, five), List.of(3,1,5,0,2,4));
+    }
     private static Map<TreeNode, List<Integer>> expectedResultsForTraversalTasks() {
 
         TreeNode one = new TreeNode(3, new TreeNode(1), new TreeNode(2));
@@ -315,6 +329,42 @@ public class TreeTraversalAndHeight {
         return (pLeftPresent == qRightPresent) &&
                 (pRightPresent == qLeftPresent) &&
                 (p.val == q.val);
+    }
+
+    public static TreeNode sortedArrayToBST(int[]nums) {
+        if (nums.length == 0)
+            return null;
+        if (nums.length == 1)
+            return new TreeNode(nums[0]);
+        if (nums.length == 2)
+            return new TreeNode(nums[0], null, new TreeNode(nums[1]));
+        if (nums.length == 3)
+            return new TreeNode(nums[1], new TreeNode(nums[0]), new TreeNode(nums[2]));
+
+        int median = nums.length / 2;
+        TreeNode first = sortedArrayToBST(nums, 0, median-1);
+        TreeNode second = sortedArrayToBST(nums, median+1, nums.length-1);
+
+        TreeNode result = new TreeNode(nums[median], first, second);
+
+        return result;
+    }
+
+    private static TreeNode sortedArrayToBST(int[]nums, int leftEdge, int rightEdge) {
+        if (rightEdge-leftEdge == 0)
+            return new TreeNode(nums[rightEdge]);
+        if (rightEdge-leftEdge == 1)
+            return new TreeNode(nums[leftEdge], null, new TreeNode(nums[rightEdge]));
+        if (rightEdge-leftEdge == 2)
+            return new TreeNode(nums[leftEdge+1], new TreeNode(nums[leftEdge]), new TreeNode(nums[rightEdge]));
+
+        int median = leftEdge + (rightEdge-leftEdge)/2;
+        TreeNode first = sortedArrayToBST(nums, leftEdge, median-1);
+        TreeNode second = sortedArrayToBST(nums, median+1, rightEdge);
+
+        TreeNode result = new TreeNode(nums[median], first, second);
+
+        return result;
     }
 
 }

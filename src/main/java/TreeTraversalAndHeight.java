@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TreeTraversalAndHeight {
@@ -15,10 +16,13 @@ public class TreeTraversalAndHeight {
 //                        System.out.printf("for %s expected result is %s and actual is %s\n",
 //                                item.getKey(), item.getValue(), calculateMaxTreeHeight(item.getKey())));
 
-        expectedResultsForArrayToBst().entrySet().stream()
-                .forEach((item -> System.out.printf("for %s expected result is %s and actual is %s\n",
+//        expectedResultsForArrayToBst().entrySet().stream()
+//                .forEach((item -> System.out.printf("for %s expected result is %s and actual is %s\n",
 //                        item.getKey(), item.getValue(), sortedArrayToBST(new int[]{-10,-3,0,5,9}))));
-                        item.getKey(), item.getValue(), sortedArrayToBST(new int[]{0,1,2,3,4,5,6,7,8}))));
+//                        item.getKey(), item.getValue(), sortedArrayToBST(new int[]{0,1,2,3,4,5,6,7,8}))));
+
+        expectedResultsForIsBalanced().entrySet().stream()
+                .forEach(entry -> System.out.printf("for %s expected is %b and actual is %b\n", entry.getKey(), entry.getValue(), isBalanced(entry.getKey())));
     }
 
     private static Map<TreeNode, List<Integer>> expectedResultsForArrayToBst() {
@@ -365,6 +369,67 @@ public class TreeTraversalAndHeight {
         TreeNode result = new TreeNode(nums[median], first, second);
 
         return result;
+    }
+
+    // not quite correct due to a bit surprising 'height-balanced' definition on leetcode
+    // only recursive approach (was borrowed from discussion) was accepted
+    // https://leetcode.com/problems/balanced-binary-tree/discussion/comments/1673794
+    public static boolean isBalanced(TreeNode root) {
+        if (root == null) return true;
+        Queue<Pair> queue = new ArrayDeque<>();
+        int minHeight = Integer.MAX_VALUE;
+        int maxHeight = 0;
+
+        queue.offer(new Pair(root, 1));
+        while (!queue.isEmpty()) {
+            Pair current = queue.poll();
+            if ((current.node.left == null && current.node.right != null) || (current.node.left !=null && current.node.right == null)) return false;
+
+            if (current.node.left == null && current.node.right == null) {
+                if (current.height > maxHeight) maxHeight = current.height;
+                if (current.height < minHeight) minHeight = current.height;
+            }
+
+
+            if (current.node.left != null) queue.offer(new Pair(current.node.left, current.height + 1));
+            if (current.node.right != null) queue.offer(new Pair(current.node.right, current.height + 1));
+        }
+
+        return maxHeight - minHeight <= 1;
+    }
+
+    // slight modification of https://leetcode.com/problems/balanced-binary-tree/discussion/comments/1570266
+    public static boolean isBalancedRecursive(TreeNode root) {
+        AtomicBoolean result = new AtomicBoolean(true);
+        depth(root, result);
+        return result.get();
+    }
+
+    private static int depth(TreeNode node, AtomicBoolean isBalanced) {
+        if (node == null) return 0;
+
+        int left = depth(node.left, isBalanced);
+        int right = depth(node.right, isBalanced);
+
+        if (Math.abs(left-right) > 1) isBalanced.set(false);
+
+        return Math.max(left, right) + 1;
+    }
+
+    private static Map<TreeNode, Boolean> expectedResultsForIsBalanced() {
+//        TreeNode leaf15 = new TreeNode(15);
+//        TreeNode leaf7 = new TreeNode(7);
+//        TreeNode leaf9 = new TreeNode(9);
+//        TreeNode node20 = new TreeNode(20, leaf15, leaf7);
+//        TreeNode node3 = new TreeNode(3, leaf9, node20);
+//
+//        return Map.of(node3, Boolean.TRUE);
+
+        TreeNode leaf3 = new TreeNode(3);
+        TreeNode node2 = new TreeNode(2, null, leaf3);
+        TreeNode node1 = new TreeNode(1, null, node2);
+
+        return Map.of(node1, Boolean.FALSE);
     }
 
 }

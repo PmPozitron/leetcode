@@ -30,4 +30,23 @@ public class PascalsTriangle {
 
         return result;
     }
+
+    public static List<Integer> getRow(int rowNum) {
+        List<Integer> result = new ArrayList<>();
+        result.add(1);
+
+        for (int i=1; i<rowNum; i++) {
+            List<Integer> list = new ArrayList<>(i);
+            list.add(1);
+            list.add(list.size()-1, 1);
+
+            for (int j=1; j<i; j++) {
+                int aNew=result.get(j-1) + result.get(j);
+                list.add(j, aNew);
+            }
+            result = list;
+        }
+
+        return result;
+    }
 }

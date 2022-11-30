@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class TreeTraversalAndHeight {
+public class TreeTasks {
     public static void main(String[] args) {
 //        expectedResultsForTraversalTasks().entrySet().stream()
 //                .forEach(item ->

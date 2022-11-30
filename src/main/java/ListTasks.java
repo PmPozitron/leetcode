@@ -1,12 +1,9 @@
-import com.sun.source.util.Trees;
-
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.TreeSet;
 
-public class DuplicatesRemover {
+public class ListTasks {
 
     public static void main(String[] args) {
         ListNode one = new ListNode(1, new ListNode(1, new ListNode(2)));
@@ -37,6 +34,38 @@ public class DuplicatesRemover {
         }
 
         return head;
+    }
+
+    public static boolean hasCycle(ListNode head) {
+        if (head == null) return false;
+        HashSet<ListNode> visited = new HashSet<>();
+        ListNode current = head.next;
+        while (current != null) {
+            if (visited.add(current))
+                current = current.next;
+            else return true;
+        }
+        return false;
+    }
+
+    public static boolean hasCycleWoSet(ListNode head) {
+        if (head == null) return false;
+        ListNode singleStepCursor = head.next;
+        if (singleStepCursor == null) return false;
+        ListNode doubleStepCursor = head.next.next;
+        if (doubleStepCursor == null) return false;
+
+        while (singleStepCursor != null && doubleStepCursor != null) {
+            if (singleStepCursor == doubleStepCursor)
+                return true;
+            else {
+                singleStepCursor = singleStepCursor.next;
+                if (doubleStepCursor.next == null)
+                    return false;
+                else doubleStepCursor = doubleStepCursor.next.next;
+            }
+        }
+        return false;
     }
 }
 

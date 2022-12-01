@@ -9,10 +9,27 @@ public class ListTasks {
 //        expectedResultsForDeleteDuplicates().entrySet().stream()
 //                .forEach(item -> System.out.printf("input is %s, expected result is %s, actual result is %s\n", item.getKey(), item.getValue(), deleteDuplicates(item.getKey())));
 
-        expectedResultsForGetIntersectionNode().entrySet().stream()
-                .forEach(item -> System.out.println("intersection on " + getIntersectionNode(item.getKey(), item.getValue())));
+//        expectedResultsForGetIntersectionNode().entrySet().stream()
+//                .forEach(item -> System.out.println("intersection on " + getIntersectionNode(item.getKey(), item.getValue())));
+
+        expectedResultsForIsPalindrome().entrySet().stream()
+                .forEach(item -> System.out.printf("%b\n", isPanindrome2(item.getKey())));
+
+
     }
 
+    private static Map<ListNode, Boolean> expectedResultsForIsPalindrome() {
+//        ListNode tail = new ListNode(1);
+//        ListNode twoBeforeTail = new ListNode(2, tail);
+//        ListNode twoBeforeTwo = new ListNode(2, twoBeforeTail);
+//        ListNode head = new ListNode(1, twoBeforeTwo);
+//        return Map.of(head, true);
+
+        ListNode tail = new ListNode(2);
+        ListNode head = new ListNode(1, tail);
+
+        return Map.of(head, false);
+    }
     private static Map<ListNode,List<Integer>> expectedResultsForDeleteDuplicates() {
         ListNode one = new ListNode(1, new ListNode(1, new ListNode(2)));
         ListNode two = new ListNode(1, new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(3)))));
@@ -154,6 +171,59 @@ public class ListTasks {
         }
 
         return node;
+    }
+
+    public static boolean isPalindrome(ListNode head) {
+        if (head == null || head.next == null) return true;
+
+        ListNode reversed = reverseList(head);
+        ListNode cursor1 = head;
+        ListNode cursor2 = reversed;
+
+        while (cursor1 != null) {
+            if (cursor1.val != cursor2.val) return false;
+            cursor1 = cursor1.next;
+            cursor2 = cursor2.next;
+        }
+
+        return true;
+    }
+
+    public static boolean isPanindrome2(ListNode head) {
+        if (head == null || head.next == null) return true;
+        int length = 0;
+        ListNode cursor = head;
+        while (cursor != null) {
+            length++;
+            cursor = cursor.next;
+        }
+        int median = 0;
+        median = length%2 == 0
+                ? length/2 - 1
+                : length/2;
+
+        cursor = head;
+        ListNode reversed = null;
+        ListNode aNew = null;
+        for(int i=0;i<=median;i++) {
+            aNew = new ListNode(cursor.val, reversed);
+            reversed = aNew;
+            cursor = cursor.next;
+        }
+
+        median = length/2;
+
+        cursor = head;
+        for (int i=0;i<median;i++) {
+            cursor = cursor.next;
+        }
+        ListNode reversedCursor = reversed;
+        while(cursor != null) {
+            if (cursor.val != reversedCursor.val) return false;
+            cursor = cursor.next;
+            reversedCursor = reversedCursor.next;
+        }
+        return true;
     }
 }
 

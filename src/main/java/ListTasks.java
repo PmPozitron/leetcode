@@ -12,12 +12,26 @@ public class ListTasks {
 //        expectedResultsForGetIntersectionNode().entrySet().stream()
 //                .forEach(item -> System.out.println("intersection on " + getIntersectionNode(item.getKey(), item.getValue())));
 
-        expectedResultsForIsPalindrome().entrySet().stream()
-                .forEach(item -> System.out.printf("%b\n", isPanindrome2(item.getKey())));
+//        expectedResultsForIsPalindrome().entrySet().stream()
+//                .forEach(item -> System.out.printf("%b\n", isPanindrome2(item.getKey())));
+
+        expectedResultsForReverseBetween().entrySet().stream()
+                .forEach(entry -> System.out.println(reverseBetween(entry.getKey(), 1, 2)));
 
 
     }
 
+    private static Map<ListNode, List<Integer>> expectedResultsForReverseBetween() {
+//        ListNode tail = new ListNode(5);
+//        ListNode four = new ListNode(4, tail);
+//        ListNode three = new ListNode(3, four);
+//        ListNode two = new ListNode(2, three);
+//        ListNode head = new ListNode(1, two);
+//
+//        return Map.of(head, List.of(1,4,3,2,5));
+
+        return Map.of(new ListNode(3, new ListNode(5)), List.of(3,5));
+    }
     private static Map<ListNode, Boolean> expectedResultsForIsPalindrome() {
 //        ListNode tail = new ListNode(1);
 //        ListNode twoBeforeTail = new ListNode(2, tail);
@@ -189,7 +203,7 @@ public class ListTasks {
         return true;
     }
 
-    public static boolean isPanindrome2(ListNode head) {
+    public static boolean isPalindrome2(ListNode head) {
         if (head == null || head.next == null) return true;
         int length = 0;
         ListNode cursor = head;
@@ -224,6 +238,43 @@ public class ListTasks {
             reversedCursor = reversedCursor.next;
         }
         return true;
+    }
+
+    public static ListNode reverseBetween(ListNode head, int left, int right) {
+        if (head == null || head.next == null)
+            return head;
+        if (right == left)
+            return head;
+
+        ListNode cursorOne = head;
+        ListNode cursorTwo = head;
+        ListNode beforeLeftInsertionPoint = head;
+
+        for (int i=1;i<left;i++) {
+            if (i==left-1)
+                beforeLeftInsertionPoint = cursorOne;
+
+            cursorOne = cursorOne.next;
+            cursorTwo = cursorTwo.next;
+        }
+
+        ListNode reversed = new ListNode(cursorOne.val);
+        ListNode beforeRightInsertionPoint = reversed;
+        ListNode aNew = null;
+
+        for (int i=left;i<right;i++) {
+            cursorTwo = cursorTwo.next;
+            aNew = new ListNode(cursorTwo.val, reversed);
+            reversed = aNew;
+        }
+        if (left == 1)
+            head = aNew;
+        else
+            beforeLeftInsertionPoint.next = aNew;
+
+        beforeRightInsertionPoint.next = cursorTwo.next;
+
+        return head;
     }
 }
 

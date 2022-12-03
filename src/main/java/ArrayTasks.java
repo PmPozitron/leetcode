@@ -94,4 +94,203 @@ public class ArrayTasks {
                 .get()
                 .getKey();
     }
+
+    public static int[] merge(int[] nums1, int m, int[] nums2, int n){
+        System.arraycopy(nums2, 0, nums1, m, n);
+        Arrays.sort(nums1);
+
+        return nums1;
+    }
+
+    // beats 100% (runtime) and 86.77% (memory)
+    public static int[] mergeLinearComplexity(int[] nums1, int m, int[] nums2, int n){
+        int j = 0;
+        for (int i=0; i<nums2.length; i++) {
+            for ( ; j<=m; j++) {
+                if (nums2[i]<= nums1[j]) {
+                    insertAndShift(nums1, j, nums2[i]);
+                    j++;
+                    m++;
+                    break;
+                } else if (j >= m) {
+                    nums1[j] = nums2[i];
+                    m++;
+                    break;
+                }
+            }
+        }
+        return nums1;
+    }
+
+    public static void insertAndShift(int[] nums, int position, int val) {
+        for (int i = nums.length-1 ; i>position; i--) {
+            nums[i] = nums[i-1];
+        }
+        nums[position] = val;
+//        System.out.printf("position %d, val %d, array %s\n",position, val, Arrays.toString(nums));
+    }
+
+// с собеса ВК.Видео
+// Даны интервалы на отрезке прямой.
+// Каждый интервал задан парой чисел [a, b], которые обозначают левую и правую границу.
+// Напишите функцию, которая выполняет объединение интервалов и возвращает список объединенных интервалов.
+// Пример:
+// intervals = [[1, 6], [5, 7], [9, 10], [8, 9]];
+// mergeIntervals(Intervals); // -> [[1, 7], [8, 10]]
+    private static int[][] mergeIntervals(int[][] intervals) {
+        long start = System.nanoTime();
+        var sortedAsList = new LinkedList<Integer>();
+        var sorted = Arrays.stream(intervals)
+                .sorted(Comparator.comparingInt(interval -> interval[0]))
+                .flatMapToInt(arr -> Arrays.stream(arr))
+                .peek(sortedAsList::addLast)
+                .toArray();
+
+//        System.out.println(sortedAsList);
+
+        boolean showMustGoOn = true;
+        while (showMustGoOn) {
+            showMustGoOn = false;
+
+            var iterator = sortedAsList.listIterator();
+            iterator.next();
+            for (int i = 1; i < sortedAsList.size() - 1; i += 2) {
+                int current = iterator.next();
+                int next = iterator.next();
+                if (current >= next) {
+                    iterator.previous();
+                    iterator.remove();
+
+                    iterator.previous();
+                    iterator.remove();
+
+                    showMustGoOn = true;
+                }
+            }
+        }
+
+        var result = new int[sortedAsList.size()/2][2];
+        for (int i = 1, j = 0; i<sortedAsList.size(); i+=2, j++) {
+            result[j] = new int[]{sortedAsList.get(i-1), sortedAsList.get(i)};
+        }
+
+//        System.out.println(System.nanoTime() - start);
+        return result;
+    }
+
+    public static int[][] inputForMergeIntervals() {
+        return new int[][]{{1, 6}, {5, 7}, {9, 10}, {8, 9}};
+    }
+
+    // https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+    public static int maxProfit(int[] prices) {
+        int maxProfit = 0;
+        int currentProfit;
+        int leastPrice = Integer.MAX_VALUE;
+        for (int i=0; i<prices.length;i++) {
+            int currentPrice = prices[i];
+            currentProfit = currentPrice-leastPrice;
+            if (currentProfit>maxProfit)
+                maxProfit=currentProfit;
+
+            if (currentPrice<leastPrice)
+                leastPrice=currentPrice;
+        }
+        return maxProfit;
+    }
+
+    private static Map<int[], int[]> inputAndExpectedResultsForPlusOne() {
+        return Map.of(
+                new int[]{1,2,3}, new int[]{1,2,4}
+                , new int[]{4,3,2,1}, new int[]{4,3,2,2}
+                , new int[]{9}, new int[]{10}
+        );
+    }
+    public static int[] plusOne(int[] digits) {
+        boolean needToGrow = true;
+        for (int i = digits.length-1; i>=0; i--) {
+            int current = digits[i] + 1;
+            if (current < 10) {
+                digits[i] = current;
+                needToGrow = false;
+                break;
+            } else {
+                digits[i] = 0;
+            }
+        }
+        if (needToGrow) {
+            int[] result = new int[digits.length +1];
+            System.arraycopy(digits, 0, result, 1, digits.length);
+            result[0] = 1;
+            return result;
+        } else {
+            return digits;
+        }
+    }
+
+    public static int removeDuplicates(int[] array) {
+        int removedQuantity = 0;
+        for (int i = 0; i < array.length-1; i++) {
+            int current = array[i];
+            if (current == Integer.MIN_VALUE) break;
+            while(current == array[i+1]) {
+                shiftForRemoveDuplicates(array, i, removedQuantity);
+                removedQuantity++;
+            }
+        }
+
+        return array.length - removedQuantity;
+    }
+
+    private static void shiftForRemoveDuplicates(int[] array, int index, int removedQty) {
+        for (int i = index; i < array.length-1; i++) {
+            array[i] = array[i+1];
+        }
+        array[array.length-1-removedQty] = Integer.MIN_VALUE;
+
+        System.out.println(removedQty + " " + Arrays.toString(array));
+    }
+
+    private static int removeElement(int[]nums, int val) {
+        int counter = 0;
+        for (int i = 0; i < nums.length - counter; i++) {
+            while (nums[i] == val && i + counter < nums.length) {
+                shiftForRemoveElement(nums, i, counter);
+                counter++;
+            }
+        }
+        return nums.length - counter;
+    }
+
+    private static void shiftForRemoveElement(int[] nums, int index, int counter) {
+        for (int i = index; i < nums.length-counter-1; i++) {
+            nums[i] = nums[i+1];
+        }
+    }
+
+    public static int searchInsertPosition(int[]nums, int target) {
+        int result = -1;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] >= target) {
+                result = i;
+                break;
+            }
+        }
+        return result == -1
+                ? nums.length
+                : result;
+    }
+
+    public static int singleNumber(int[]nums) {
+        HashMap<Integer, Boolean> theMap = new HashMap<>();
+
+        Arrays.stream(nums)
+                .forEach(i -> theMap.merge(i, Boolean.FALSE, (old, aNew) -> Boolean.TRUE));
+
+        return theMap.entrySet().stream()
+                .filter(entry -> ! entry.getValue())
+                .findFirst()
+                .get()
+                .getKey();
+    }
 }

@@ -1,16 +1,21 @@
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ArrayTasks {
 
     public static void main(String[] args) {
-        System.out.println(mostFrequentEven(new int[]{0,1,2,2,4,4,1}));
+        tasksForContainsNearbyDuplicate().entrySet().forEach(entry -> System.out.println(Arrays.toString(entry.getKey()) + " " + entry.getValue() + " " + containsNearbyDuplicate(entry.getKey(), entry.getValue())));
     }
 
     public static int majorityElement(int[] nums) {
@@ -293,4 +298,71 @@ public class ArrayTasks {
                 .get()
                 .getKey();
     }
+
+    public static boolean containsDuplicate(int[] nums) {
+//        return Arrays.stream(nums)
+//                .mapToObj(Integer::valueOf)
+//                .collect(Collectors.toMap(Function.identity(), i -> 1, (anOld, aNew) -> anOld+aNew))
+//                .entrySet().stream()
+//                .filter(entry -> entry.getValue() > 1)
+//                .findAny()
+//                .isPresent();
+
+        HashSet<Integer> set = new HashSet<>();
+        for (int i : nums) {
+            if (! set.add(i)) return true;
+        }
+        return false;
+    }
+    public static boolean containsNearbyDuplicate(int[] nums, int k) {
+        HashMap<Integer, List<Integer>> theMap = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            theMap.merge(nums[i], new LinkedList<>(Arrays.asList(i)), (anOld, aNew) -> {
+                anOld.addAll(aNew);
+                return anOld;
+            });
+        }
+
+        for (Map.Entry<Integer, List<Integer>> entry : theMap.entrySet()) {
+            if (entry.getValue().size() < 2) continue;
+
+            Iterator<Integer> outer = entry.getValue().iterator();
+            int shift = 0;
+
+            while (outer.hasNext()) {
+                Integer outerInt = outer.next();
+                shift++;
+                Iterator<Integer> inner = entry.getValue().iterator();
+                IntStream.range(0, shift).forEach(i -> inner.next());
+
+                while(inner.hasNext()) {
+                    Integer innerInt = inner.next();
+                    if (Math.abs(outerInt - innerInt) <= k) return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+//    https://leetcode.com/problems/contains-duplicate-ii/solutions/61372/simple-java-solution/
+    public boolean containsNearbyDuplicateSlidingWindow(int[] nums, int k) {
+        Set<Integer> set = new HashSet<Integer>();
+        for(int i = 0; i < nums.length; i++){
+            if(i > k) set.remove(nums[i-k-1]);
+            if(!set.add(nums[i])) return true;
+        }
+        return false;
+    }
+
+    private static Map<int[], Integer> tasksForContainsNearbyDuplicate() {
+        return Map.of(
+                new int[]{1,2,3,1,2,3}, 2
+        );
+    }
+
+
+
+
+
 }

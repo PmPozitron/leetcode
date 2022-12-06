@@ -15,8 +15,11 @@ public class ListTasks {
 //        expectedResultsForIsPalindrome().entrySet().stream()
 //                .forEach(item -> System.out.printf("%b\n", isPanindrome2(item.getKey())));
 
-        expectedResultsForReverseBetween().entrySet().stream()
-                .forEach(entry -> System.out.println(reverseBetween(entry.getKey(), 1, 2)));
+//        expectedResultsForReverseBetween().entrySet().stream()
+//                .forEach(entry -> System.out.println(reverseBetween(entry.getKey(), 1, 2)));
+
+        tasksForAddTwoNumbers().entrySet().stream()
+                .forEach(entry -> System.out.println(addTwoNumbers(entry.getKey(), entry.getValue())));
 
 
     }
@@ -276,6 +279,60 @@ public class ListTasks {
 
         return head;
     }
+
+    public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode firstCursor = l1;
+        ListNode secondCursor = l2;
+        ListNode result = null;
+        ListNode previous = null;
+        ListNode aNew = null;
+        int carry = 0;
+
+        while (!(firstCursor == null && secondCursor == null)) {
+            int first = 0;
+            if (firstCursor != null) {
+                first = firstCursor.val;
+                firstCursor = firstCursor.next;
+            }
+            int second = 0;
+            if (secondCursor != null) {
+                second = secondCursor.val;
+                secondCursor = secondCursor.next;
+            }
+
+            int third = first + second + carry;
+            if (third < 10) {
+                aNew = new ListNode(third);
+                carry = 0;
+            } else {
+                aNew = new ListNode(third%10);
+                carry = 1;
+            }
+
+            if (result == null) {
+                result = aNew;
+                previous = result;
+            } else {
+                previous.next = aNew;
+                previous = aNew;
+            }
+        }
+
+        if (carry != 0) {
+            aNew = new ListNode(carry);
+            previous.next = aNew;
+        }
+
+        return result;
+    }
+
+    private static Map<ListNode, ListNode> tasksForAddTwoNumbers() {
+        return Map.of(
+                new ListNode(2, new ListNode(4, new ListNode(3))), new ListNode(5, new ListNode(6, new ListNode(4))));
+//                new ListNode(1, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9)))))))))),
+//                        new ListNode(9));
+    }
+
 }
 
 class ListNode {

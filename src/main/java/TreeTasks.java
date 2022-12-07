@@ -431,6 +431,71 @@ public class TreeTasks {
         return Map.of(node1, Boolean.FALSE);
     }
 
+    public static List<Integer> preorderTraversalRecursive(TreeNode root) {
+        if (root == null) return Collections.emptyList();
+
+        LinkedList<Integer> result = new LinkedList<>();
+        result.add(root.val);
+        result.addAll(preorderTraversalRecursive(root.left));
+        result.addAll(preorderTraversalRecursive(root.right));
+
+        return result;
+    }
+
+    public static List<Integer> preorderTraversalIterative(TreeNode root) {
+        if (root == null)
+            return Collections.emptyList();
+
+        LinkedList<Integer> result = new LinkedList<>();
+        ArrayDeque<TreeNode> queue = new ArrayDeque();
+        queue.offer(root);
+
+        while(! queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            result.add(current.val);
+            if (current.right != null)
+                queue.offerFirst(current.right);
+            if (current.left != null)
+                queue.offerFirst(current.left);
+        }
+
+        return result;
+    }
+
+    public static List<Integer> postorderTraversal(TreeNode root) {
+        if (root == null)
+            return Collections.emptyList();
+
+        LinkedList<Integer> result = new LinkedList<>();
+        HashSet<TreeNode> visited = new HashSet<>();
+        ArrayDeque<TreeNode> queue = new ArrayDeque();
+        queue.offer(root);
+
+        while (! queue.isEmpty()) {
+            TreeNode current = queue.peek();
+            if (current.left == null && current.right == null) {
+                queue.poll();
+                result.add(current.val);
+                continue;
+            }
+
+            if (visited.contains(current)) {
+                queue.poll();
+                result.add(current.val);
+                continue;
+            }
+
+            if (current.right != null)
+                queue.offerFirst(current.right);
+
+            if (current.left != null)
+                queue.offerFirst(current.left);
+
+            visited.add(current);
+        }
+
+        return result;
+    }
 }
 
 class TreeNode {

@@ -18,8 +18,11 @@ public class ListTasks {
 //        expectedResultsForReverseBetween().entrySet().stream()
 //                .forEach(entry -> System.out.println(reverseBetween(entry.getKey(), 1, 2)));
 
-        tasksForAddTwoNumbers().entrySet().stream()
-                .forEach(entry -> System.out.println(addTwoNumbers(entry.getKey(), entry.getValue())));
+//        tasksForAddTwoNumbers().entrySet().stream()
+//                .forEach(entry -> System.out.println(addTwoNumbers(entry.getKey(), entry.getValue())));
+
+        tasksAndExpectedResultsForOddEvenList().entrySet().stream()
+                .forEach(entry -> System.out.printf("input is %s, expected is %s and actual is %s\n", entry.getKey(), entry.getValue(), oddEvenList(entry.getKey())));
 
 
     }
@@ -331,6 +334,41 @@ public class ListTasks {
                 new ListNode(2, new ListNode(4, new ListNode(3))), new ListNode(5, new ListNode(6, new ListNode(4))));
 //                new ListNode(1, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9, new ListNode(9)))))))))),
 //                        new ListNode(9));
+    }
+
+    public static ListNode oddEvenList(ListNode head) {
+        if (head == null || head.next == null || head.next.next == null)
+            return head;
+
+        ListNode currentOdd = head;
+        ListNode currentEven = head.next;
+        ListNode insertionPoint = currentEven;
+
+        while (true) {
+            currentOdd.next = currentEven.next;
+            currentOdd = currentEven.next;
+
+            if (currentOdd.next == null) {
+                currentEven.next = null;
+                currentOdd.next = insertionPoint;
+                break;
+
+            } else {
+                currentEven.next = currentOdd.next;
+                currentEven = currentOdd.next;
+            }
+
+            if (currentEven.next == null) {
+                currentOdd.next = insertionPoint;
+                break;
+            }
+        }
+
+        return head;
+    }
+
+    private static Map<ListNode, List<Integer>> tasksAndExpectedResultsForOddEvenList() {
+        return Map.of(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4)))), List.of(1,2,3,4));
     }
 
 }

@@ -36,8 +36,9 @@ public class ListTasks {
 //
 //        return Map.of(head, List.of(1,4,3,2,5));
 
-        return Map.of(new ListNode(3, new ListNode(5)), List.of(3,5));
+        return Map.of(new ListNode(3, new ListNode(5)), List.of(3, 5));
     }
+
     private static Map<ListNode, Boolean> expectedResultsForIsPalindrome() {
 //        ListNode tail = new ListNode(1);
 //        ListNode twoBeforeTail = new ListNode(2, tail);
@@ -50,14 +51,15 @@ public class ListTasks {
 
         return Map.of(head, false);
     }
-    private static Map<ListNode,List<Integer>> expectedResultsForDeleteDuplicates() {
+
+    private static Map<ListNode, List<Integer>> expectedResultsForDeleteDuplicates() {
         ListNode one = new ListNode(1, new ListNode(1, new ListNode(2)));
         ListNode two = new ListNode(1, new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(3)))));
 
         return Map.of(
-                        one, List.of(1, 2),
-                        two, List.of(1, 2, 3)
-                );
+                one, List.of(1, 2),
+                two, List.of(1, 2, 3)
+        );
     }
 
     private static Map<ListNode, ListNode> expectedResultsForGetIntersectionNode() {
@@ -218,27 +220,27 @@ public class ListTasks {
             cursor = cursor.next;
         }
         int median = 0;
-        median = length%2 == 0
-                ? length/2 - 1
-                : length/2;
+        median = length % 2 == 0
+                ? length / 2 - 1
+                : length / 2;
 
         cursor = head;
         ListNode reversed = null;
         ListNode aNew = null;
-        for(int i=0;i<=median;i++) {
+        for (int i = 0; i <= median; i++) {
             aNew = new ListNode(cursor.val, reversed);
             reversed = aNew;
             cursor = cursor.next;
         }
 
-        median = length/2;
+        median = length / 2;
 
         cursor = head;
-        for (int i=0;i<median;i++) {
+        for (int i = 0; i < median; i++) {
             cursor = cursor.next;
         }
         ListNode reversedCursor = reversed;
-        while(cursor != null) {
+        while (cursor != null) {
             if (cursor.val != reversedCursor.val) return false;
             cursor = cursor.next;
             reversedCursor = reversedCursor.next;
@@ -256,8 +258,8 @@ public class ListTasks {
         ListNode cursorTwo = head;
         ListNode beforeLeftInsertionPoint = head;
 
-        for (int i=1;i<left;i++) {
-            if (i==left-1)
+        for (int i = 1; i < left; i++) {
+            if (i == left - 1)
                 beforeLeftInsertionPoint = cursorOne;
 
             cursorOne = cursorOne.next;
@@ -268,7 +270,7 @@ public class ListTasks {
         ListNode beforeRightInsertionPoint = reversed;
         ListNode aNew = null;
 
-        for (int i=left;i<right;i++) {
+        for (int i = left; i < right; i++) {
             cursorTwo = cursorTwo.next;
             aNew = new ListNode(cursorTwo.val, reversed);
             reversed = aNew;
@@ -308,7 +310,7 @@ public class ListTasks {
                 aNew = new ListNode(third);
                 carry = 0;
             } else {
-                aNew = new ListNode(third%10);
+                aNew = new ListNode(third % 10);
                 carry = 1;
             }
 
@@ -352,11 +354,10 @@ public class ListTasks {
                 currentEven.next = null;
                 currentOdd.next = insertionPoint;
                 break;
-
-            } else {
-                currentEven.next = currentOdd.next;
-                currentEven = currentOdd.next;
             }
+
+            currentEven.next = currentOdd.next;
+            currentEven = currentOdd.next;
 
             if (currentEven.next == null) {
                 currentOdd.next = insertionPoint;
@@ -368,7 +369,7 @@ public class ListTasks {
     }
 
     private static Map<ListNode, List<Integer>> tasksAndExpectedResultsForOddEvenList() {
-        return Map.of(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4)))), List.of(1,2,3,4));
+        return Map.of(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4)))), List.of(1, 2, 3, 4));
     }
 
 }

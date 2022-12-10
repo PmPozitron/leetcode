@@ -59,6 +59,13 @@ public class IntegersTasks {
                 : current * -1;
     }
 
+    public static boolean isPalindrome(int x) {
+        if (x < 0) return false;
+        if (x == 0) return true;
+
+        return x == reverseIntegerWoLong(x);
+    }
+
     public static int myAtoi(String s) {
         s = s.trim();
         if (s.length() == 0) return 0;

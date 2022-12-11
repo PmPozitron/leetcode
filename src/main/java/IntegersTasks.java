@@ -3,7 +3,37 @@ public class IntegersTasks {
     public static void main(String[] args) {
 //        System.out.println(Integer.toBinaryString(reverseBits(9)));
 //        System.out.println(reverseIntegerWoLong("2147483646"));
-        System.out.println(myAtoi("-2147483647"));
+//        System.out.println(myAtoi("-2147483647"));
+        System.out.println(hammingWeight(3));
+    }
+
+    public static int hammingWeight(int n) {
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+
+        int result = 0;
+        for (int i = 0; i < 32; i++) {
+            if ((n>>i & 1) == 1)
+                result++;
+        }
+
+        return result;
+    }
+
+    public static int[] countBits(int n) {
+        int[] result = new int[n+1];
+        for (int i = 0; i <= n; i++) {
+            result[i] = hammingWeight(i);
+        }
+        return result;
+    }
+
+//    https://leetcode.com/problems/counting-bits/solutions/79539/three-line-java-solution/?orderBy=most_votes&languageTags=java
+//    https://leetcode.com/problems/counting-bits/solutions/79539/three-line-java-solution/comments/242115
+    public int[] countBitsOnePass(int num) {
+        int[] f = new int[num + 1];
+        for (int i=1; i<=num; i++) f[i] = f[i >> 1] + (i & 1);
+        return f;
     }
 
     public static int reverseBits(int n) {

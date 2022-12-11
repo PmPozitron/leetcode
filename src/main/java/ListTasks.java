@@ -21,10 +21,39 @@ public class ListTasks {
 //        tasksForAddTwoNumbers().entrySet().stream()
 //                .forEach(entry -> System.out.println(addTwoNumbers(entry.getKey(), entry.getValue())));
 
-        tasksAndExpectedResultsForOddEvenList().entrySet().stream()
-                .forEach(entry -> System.out.printf("input is %s, expected is %s and actual is %s\n", entry.getKey(), entry.getValue(), oddEvenList(entry.getKey())));
+//        tasksAndExpectedResultsForOddEvenList().entrySet().stream()
+//                .forEach(entry -> System.out.printf("input is %s, expected is %s and actual is %s\n", entry.getKey(), entry.getValue(), oddEvenList(entry.getKey())));
+
+        System.out.println(removeElements(new ListNode(1, new ListNode(2, new ListNode(2, new ListNode(1)))), 2));
 
 
+    }
+
+    public static ListNode removeElements (ListNode head, int val) {
+        if (head == null)
+            return head;
+
+        ListNode previous = null;
+        ListNode current = head;
+
+        while (current != null) {
+            if (current.val == val) {
+                if (previous == null) {
+                    head = head.next;
+                    current = head;
+                    continue;
+                }
+                else {
+                    previous.next = current.next;
+                    current = current.next;
+                    continue;
+                }
+            }
+            previous = current;
+            current = current.next;
+        }
+
+        return head;
     }
 
     private static Map<ListNode, List<Integer>> expectedResultsForReverseBetween() {

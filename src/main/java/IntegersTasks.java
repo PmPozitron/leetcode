@@ -1,4 +1,6 @@
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 public class IntegersTasks {
@@ -7,14 +9,39 @@ public class IntegersTasks {
 //        System.out.println(Integer.toBinaryString(reverseBits(9)));
 //        System.out.println(reverseIntegerWoLong("2147483646"));
 //        System.out.println(myAtoi("-2147483647"));
-        int[] input = IntStream.concat(
-                Arrays.stream(HugeTasksForTotalHammingDistance.HUGE_ARRAY_PART_ONE),
-                Arrays.stream(HugeTasksForTotalHammingDistance2.HUGE_ARRAY_PART_TWO))
-                .toArray();
-
 //        System.out.println(hammingWeight(3));
-        System.out.println(input.length);
-        System.out.println(totalHammingDistance(input));
+
+//        int[] input = IntStream.concat(
+//                Arrays.stream(HugeTasksForTotalHammingDistance.HUGE_ARRAY_PART_ONE),
+//                Arrays.stream(HugeTasksForTotalHammingDistance2.HUGE_ARRAY_PART_TWO))
+//                .toArray();
+//        System.out.println(input.length);
+//        System.out.println(totalHammingDistance(input));
+        System.out.println(isHappy(2));
+    }
+
+    //  https://leetcode.com/problems/happy-number/
+    //  here is a solution without using extra storage. it is the same as I used for finding cycles in linked list.
+    //  https://leetcode.com/problems/happy-number/solutions/519280/java-100-using-cycle-finding-algorithm/?orderBy=most_votes&languageTags=java
+    public static boolean isHappy(int n) {
+        Set<Integer> checked = new HashSet<>();
+        int i = n;
+        int j = 0;
+        int k = 0;
+        while (k != 1) {
+            while (i != 0) {
+                j = i % 10;
+                k = k + (int) Math.pow(j, 2);
+                i /= 10;
+            }
+            if (k != 1) {
+                if (!checked.add(k))
+                    return false;
+                i = k;
+                k = 0;
+            }
+        }
+        return true;
     }
 
     public static int hammingDistance(int x, int y) {
@@ -58,7 +85,7 @@ public class IntegersTasks {
         return result;
     }
 
-//    https://leetcode.com/problems/total-hamming-distance/solutions/603952/java-99-70-faster-simple-easy-solution/
+    //    https://leetcode.com/problems/total-hamming-distance/solutions/603952/java-99-70-faster-simple-easy-solution/
 //    https://leetcode.com/problems/total-hamming-distance/solutions/603952/java-99-70-faster-simple-easy-solution/comments/1714201
     public int totalHammingDistanceLinear(int[] nums) {
         if (nums == null) {

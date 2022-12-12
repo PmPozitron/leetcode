@@ -1,10 +1,79 @@
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 public class IntegersTasks {
 
     public static void main(String[] args) {
 //        System.out.println(Integer.toBinaryString(reverseBits(9)));
 //        System.out.println(reverseIntegerWoLong("2147483646"));
 //        System.out.println(myAtoi("-2147483647"));
-        System.out.println(hammingWeight(3));
+        int[] input = IntStream.concat(
+                Arrays.stream(HugeTasksForTotalHammingDistance.HUGE_ARRAY_PART_ONE),
+                Arrays.stream(HugeTasksForTotalHammingDistance2.HUGE_ARRAY_PART_TWO))
+                .toArray();
+
+//        System.out.println(hammingWeight(3));
+        System.out.println(input.length);
+        System.out.println(totalHammingDistance(input));
+    }
+
+    public static int hammingDistance(int x, int y) {
+        int result = 0;
+        int xx;
+        int yy;
+        for (int i = 0; i < 32; i++) {
+            xx = x >> i & 1;
+            yy = y >> i & 1;
+
+            if (xx != yy) result++;
+        }
+
+        return result;
+    }
+
+    //    https://leetcode.com/problems/hamming-distance/solutions/1585496/6-line-easy-java-solution-0ms-100-faster/?orderBy=most_votes&languageTags=java
+    public static int hammingDistanceViaXor(int x, int y) {
+        int res = 0;
+        int m = x ^ y;                  // take the xor of two numbers
+        while (m != 0) {                // count the no of "1"s
+            if ((m & 1) == 1)
+                res++;
+            m = m >> 1;
+        }
+        return res;
+    }
+
+    // fails leetcode's check with 'time limit exceeded' when given huge (length = 10_000) array
+    public static int totalHammingDistance(int[] nums) {
+        if (nums.length == 1) return 0;
+        int result = 0;
+        int current;
+        for (int i = 0; i < nums.length; i++) {
+            current = nums[i];
+            for (int j = i + 1; j < nums.length; j++) {
+                result += hammingDistance(current, nums[j]);
+            }
+        }
+
+        return result;
+    }
+
+//    https://leetcode.com/problems/total-hamming-distance/solutions/603952/java-99-70-faster-simple-easy-solution/
+//    https://leetcode.com/problems/total-hamming-distance/solutions/603952/java-99-70-faster-simple-easy-solution/comments/1714201
+    public int totalHammingDistanceLinear(int[] nums) {
+        if (nums == null) {
+            return 0;
+        }
+        int distance = 0;
+        for (int i = 0; i < 32; i++) {
+            int one_count = 0;
+            for (int j = 0; j < nums.length; j++) {
+                one_count += (nums[j] >> i) & 1;
+            }
+            // we have number of ones, calculate number of zeros and multiply them to get total number of combinations between them
+            distance += one_count * (nums.length - one_count);
+        }
+        return distance;
     }
 
     public static int hammingWeight(int n) {
@@ -13,7 +82,7 @@ public class IntegersTasks {
 
         int result = 0;
         for (int i = 0; i < 32; i++) {
-            if ((n>>i & 1) == 1)
+            if ((n >> i & 1) == 1)
                 result++;
         }
 
@@ -21,18 +90,18 @@ public class IntegersTasks {
     }
 
     public static int[] countBits(int n) {
-        int[] result = new int[n+1];
+        int[] result = new int[n + 1];
         for (int i = 0; i <= n; i++) {
             result[i] = hammingWeight(i);
         }
         return result;
     }
 
-//    https://leetcode.com/problems/counting-bits/solutions/79539/three-line-java-solution/?orderBy=most_votes&languageTags=java
+    //    https://leetcode.com/problems/counting-bits/solutions/79539/three-line-java-solution/?orderBy=most_votes&languageTags=java
 //    https://leetcode.com/problems/counting-bits/solutions/79539/three-line-java-solution/comments/242115
     public int[] countBitsOnePass(int num) {
         int[] f = new int[num + 1];
-        for (int i=1; i<=num; i++) f[i] = f[i >> 1] + (i & 1);
+        for (int i = 1; i <= num; i++) f[i] = f[i >> 1] + (i & 1);
         return f;
     }
 
@@ -72,6 +141,7 @@ public class IntegersTasks {
                 ? (int) result
                 : (int) result * -1;
     }
+
     public static int reverseIntegerWoLong(int n) {
         if (n == Integer.MIN_VALUE) return 0;
         int current = 0;
@@ -111,11 +181,11 @@ public class IntegersTasks {
             if (isDigit(ch)) {
                 next = getInteger(ch);
 
-                if ((result * sign > Integer.MAX_VALUE/10 ||
-                        (result * sign == Integer.MAX_VALUE/10 && next > Integer.MAX_VALUE % 10)))
+                if ((result * sign > Integer.MAX_VALUE / 10 ||
+                        (result * sign == Integer.MAX_VALUE / 10 && next > Integer.MAX_VALUE % 10)))
                     return Integer.MAX_VALUE;
-                if (result * sign < Integer.MIN_VALUE/10 ||
-                        (result * sign == Integer.MIN_VALUE/10 && next > -1*(Integer.MIN_VALUE % 10)))
+                if (result * sign < Integer.MIN_VALUE / 10 ||
+                        (result * sign == Integer.MIN_VALUE / 10 && next > -1 * (Integer.MIN_VALUE % 10)))
                     return Integer.MIN_VALUE;
 
                 result = result * 10 + getInteger(ch);
@@ -131,11 +201,12 @@ public class IntegersTasks {
     private static boolean isDigit(char ch) {
         return ch >= '0' && ch <= '9';
     }
+
     private static int getInteger(char ch) {
         return ch - '0';
     }
 
     private static boolean charNotAllowed(char ch) {
-        return ! (isDigit(ch) || ch == '-' || ch == '+');
+        return !(isDigit(ch) || ch == '-' || ch == '+');
     }
 }

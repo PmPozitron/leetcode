@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TreeTasks {
@@ -20,8 +21,10 @@ public class TreeTasks {
 //                        item.getKey(), item.getValue(), sortedArrayToBST(new int[]{-10,-3,0,5,9}))));
 //                        item.getKey(), item.getValue(), sortedArrayToBST(new int[]{0,1,2,3,4,5,6,7,8}))));
 
-        expectedResultsForIsBalanced().entrySet().stream()
-                .forEach(entry -> System.out.printf("for %s expected is %b and actual is %b\n", entry.getKey(), entry.getValue(), isBalanced(entry.getKey())));
+//        expectedResultsForIsBalanced().entrySet().stream()
+//                .forEach(entry -> System.out.printf("for %s expected is %b and actual is %b\n", entry.getKey(), entry.getValue(), isBalanced(entry.getKey())));
+
+        System.out.println(invertTree(new TreeNode(2, new TreeNode(1), new TreeNode(3))));
     }
 
     private static Map<TreeNode, List<Integer>> expectedResultsForArrayToBst() {
@@ -496,6 +499,22 @@ public class TreeTasks {
 
         return result;
     }
+
+    public static TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+
+        Queue<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            TreeNode current = queue.poll();
+            TreeNode copy = current.left;
+            current.left = current.right;
+            current.right = copy;
+            if (current.left != null) queue.offer(current.left);
+            if (current.right != null) queue.offer(current.right);
+        }
+        return root;
+    }
 }
 
 class TreeNode {
@@ -514,6 +533,15 @@ class TreeNode {
         this.val = val;
         this.left = left;
         this.right = right;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", TreeNode.class.getSimpleName() + "[", "]")
+                .add(""+val)
+                .add(""+left)
+                .add(""+right)
+                .toString();
     }
 }
 

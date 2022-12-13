@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -361,8 +362,56 @@ public class ArrayTasks {
         );
     }
 
+    //    https://leetcode.com/problems/summary-ranges/
+    public static List<String> summaryRanges(int[] nums) {
+        if (nums.length == 0) return Collections.emptyList();
+        if (nums.length == 1) return List.of(String.valueOf(nums[0]));
 
+        List<String> result = new LinkedList<>();
+        StringBuilder range = null;
+        boolean rangeOpened = false;
+        // [-2147483648,-2147483647,2147483647] l=3
+        // -2147483648->
+        for (int i = 0; i < nums.length-1; i++) {
+            if (range == null) {
+                range = new StringBuilder(String.valueOf(nums[i]));
+            }
 
+            boolean nextIsBiggerByAtLeastTwo = false;
+            if (nums[i] < 0 && nums[i+1] > 0) nextIsBiggerByAtLeastTwo = true;
+            else if (nums[i] > 0 && nums[i+1] < 0) nextIsBiggerByAtLeastTwo = false;
+            else if (nums[i+1] - nums[i] > 1) nextIsBiggerByAtLeastTwo = true;
+            if (nextIsBiggerByAtLeastTwo) {
+                if (rangeOpened) {
+                    range.append(nums[i]);
+                }
+                result.add(range.toString());
+                range = null;
+                rangeOpened = false;
 
+            } else {
+                if (rangeOpened && i != nums.length - 2) {
+                    continue;
+
+                } else if (!rangeOpened && i != nums.length - 2) {
+                    range.append('-').append('>');
+                    rangeOpened = true;
+                }
+            }
+
+            if (i == nums.length - 2) {
+                if (range == null)
+                    range = new StringBuilder(String.valueOf(nums[i+1]));
+                else if (rangeOpened) {
+                    range.append(nums[i+1]);
+                } else {
+                    range.append('-').append('>').append(nums[i+1]);
+                }
+                result.add(range.toString());
+            }
+        }
+
+        return result;
+    }
 
 }

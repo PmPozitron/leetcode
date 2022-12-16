@@ -426,7 +426,7 @@ public class ArrayTasks {
                 if (j < nums2.length - 1 && nums1[i] == nums2[j]) {
                     for (int k = j + 1; k < nums2.length; k++) {
                         if (nums2[j] < nums2[k]) {
-                            l = nums2[k];9
+                            l = nums2[k];
                             break;
                         }
                     }

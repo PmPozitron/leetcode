@@ -16,7 +16,9 @@ import java.util.stream.IntStream;
 public class ArrayTasks {
 
     public static void main(String[] args) {
-        tasksForContainsNearbyDuplicate().entrySet().forEach(entry -> System.out.println(Arrays.toString(entry.getKey()) + " " + entry.getValue() + " " + containsNearbyDuplicate(entry.getKey(), entry.getValue())));
+//        tasksForContainsNearbyDuplicate().entrySet().forEach(entry -> System.out.println(Arrays.toString(entry.getKey()) + " " + entry.getValue() + " " + containsNearbyDuplicate(entry.getKey(), entry.getValue())));
+
+        System.out.println(Arrays.toString(nextGreaterElement(new int[]{2,4}, new int[]{1,2,3,4})));
     }
 
     public static int majorityElement(int[] nums) {
@@ -411,6 +413,30 @@ public class ArrayTasks {
             }
         }
 
+        return result;
+    }
+
+    public static int[] nextGreaterElement(int[]nums1, int[]nums2) {
+        if (nums1.length == 0) return nums1;
+
+        int[] result = new int[nums1.length];
+        for (int i = 0; i < nums1.length; i++) {
+            int l = -1;
+            for (int j = 0; j < nums2.length; j++) {
+                if (j < nums2.length - 1 && nums1[i] == nums2[j]) {
+                    for (int k = j + 1; k < nums2.length; k++) {
+                        if (nums2[j] < nums2[k]) {
+                            l = nums2[k];9
+                            break;
+                        }
+                    }
+                    if (l != -1) {
+                        break;
+                    }
+                }
+            }
+            result[i] = l;
+        }
         return result;
     }
 

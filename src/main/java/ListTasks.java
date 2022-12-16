@@ -1,7 +1,12 @@
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ListTasks {
 
@@ -24,12 +29,17 @@ public class ListTasks {
 //        tasksAndExpectedResultsForOddEvenList().entrySet().stream()
 //                .forEach(entry -> System.out.printf("input is %s, expected is %s and actual is %s\n", entry.getKey(), entry.getValue(), oddEvenList(entry.getKey())));
 
-        System.out.println(removeElements(new ListNode(1, new ListNode(2, new ListNode(2, new ListNode(1)))), 2));
-
-
+//        System.out.println(removeElements(new ListNode(1, new ListNode(2, new ListNode(2, new ListNode(1)))), 2));
+        long start = System.nanoTime();
+        ListNode current = removeNodesViaStack(tasksAndExpectedResultsForRemoveNodes());
+        while (current != null) {
+            System.out.print(current.val + " ");
+            current = current.next;
+        }
+        System.out.println(System.nanoTime() - start);
     }
 
-    public static ListNode removeElements (ListNode head, int val) {
+    public static ListNode removeElements(ListNode head, int val) {
         if (head == null)
             return head;
 
@@ -42,8 +52,7 @@ public class ListTasks {
                     head = head.next;
                     current = head;
                     continue;
-                }
-                else {
+                } else {
                     previous.next = current.next;
                     current = current.next;
                     continue;
@@ -401,6 +410,133 @@ public class ListTasks {
         return Map.of(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4)))), List.of(1, 2, 3, 4));
     }
 
+    // treat list as an array and let its values be shifted from the last node to the given one
+    public static void deleteNode(ListNode node) {
+        if (node == null) return;
+        if (node.next == null) return;
+
+        ListNode current = node;
+        while (current != null) {
+            current.val = current.next.val;
+            if (current.next.next == null) {
+                current.next = null;
+            }
+            current = current.next;
+        }
+    }
+
+    //  https://leetcode.com/problems/remove-nodes-from-linked-list/description/
+    // this solution was not accepted due to 'time limit exceeded' when given input with length 100_000
+    public static ListNode removeNodes(ListNode head) {
+        if (head == null || head.next == null) return head;
+
+        ListNode outer = head;
+        ListNode outerPrevious = null;
+        /**
+         *
+         */
+        while (outer != null) {
+            ListNode inner = outer.next;
+            ListNode innerPrevious = outer;
+            while (inner != null && outer.val >= inner.val) {
+                innerPrevious = inner;
+                inner = inner.next;
+            }
+
+            if (inner != null) {
+                if (outerPrevious == null) {
+                    head = inner;
+                    outer = inner;
+
+                } else if (outer.next != null){
+                    outer = inner;
+                    outerPrevious.next = inner;
+
+                }
+            } else {
+                outerPrevious = outer;
+                outer = outer.next;
+            }
+        }
+        return head;
+    }
+
+    public static ListNode removeNodesWithReverse(ListNode head) {
+        head = reverseList(head);
+        ListNode prev = head, ptr = head.next;
+        int maxi = head.val;
+        for(; ptr != null; ptr = ptr.next){
+            if(ptr.val >= maxi){
+                maxi = Math.max(maxi, ptr.val);
+                prev.next = ptr;
+                prev = ptr;
+            }
+        }
+        prev.next = null;
+        head = reverseList(head);
+        return head;
+    }
+
+//    https://leetcode.com/problems/remove-nodes-from-linked-list/solutions/2851978/java-python-3-3-codes-recursive-iterative-space-o-n-and-extra-space-o-1/
+//    Method 2: non-increasing Stack
+    public static ListNode removeNodesViaStack(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        Deque<ListNode> theStack = new ArrayDeque<>();
+        ListNode current = head;
+
+        while (current != null) {
+            if (!theStack.isEmpty() && theStack.peek().val < current.val) {
+                theStack.pop();
+                continue;
+            }
+            theStack.push(current);
+            current = current.next;
+        }
+
+        ListNode aNew = null;
+        while (theStack.size() > 1) {
+            aNew = theStack.pop();
+            theStack.peek().next = aNew;
+        }
+        return theStack.peek();
+    }
+
+    private static ListNode tasksAndExpectedResultsForRemoveNodes() {
+
+        ListNode last = new ListNode(1);
+        ListNode head = new ListNode(3, new ListNode(2, last));
+
+        for (int i = 100000; i>3; i--) {
+            last.next = new ListNode(i);
+            last = last.next;
+        }
+
+//        ListNode head = new ListNode(5, new ListNode(2, new ListNode(13, new ListNode(3, new ListNode(8)))));
+
+//        AtomicReference<ListNode> head = new AtomicReference<>();
+//        AtomicReference<ListNode> previous = new AtomicReference<>();
+//        Arrays.stream(("138,466,216,67,642,978,264,136,463,331,60,600,223,275,856,809,167,101,846,165,575,276,409,590,733,200,839,515,852,615,8,584,250,337,537,63,797,900,670,636,112,701,334," +
+//                "422,780,552,912,506,313,474,183,792,822,661,37,164,601,271,902,792,501,184,559,140,506,94,161,167,622,288,457,953,700,464,785,203,729,725,422,76,191,195,157,854,730,577,503," +
+//                "401,517,692,42,135,823,883,255,111,334,365,513,338,65,600,926,607,193,763,366,674,145,229,700,11,984,36,185,475,204,604,191,898,876,762,654,770,774,575,276,165,610,649,235,749," +
+//                "440,607,962,747,891,943,839,403,655,22,705,416,904,765,905,574,214,471,451,774,41,365,703,895,327,879,414,821,363,30,130,14,754,41,494,548,76,825,899,499,188,982,8,890,563,438," +
+//                "363,32,482,623,864,161,962,678,414,659,612,332,164,580,14,633,842,969,792,777,705,436,750,501,395,342,838,493,998,112,660,961,943,721,480,522,133,129,276,362,616,52,117,300,274," +
+//                "862,487,715,272,232,543,275,68,144,656,623,317,63,908,565,880,12,920,467,559,91,698")
+//                .split(","))
+//                .forEach(i -> {
+//                    ListNode aNew = new ListNode(Integer.valueOf(i).intValue());
+//                    if (previous.get() != null) {
+//                        previous.get().next = aNew;
+//                    } else {
+//                        head.set(aNew);
+//                    }
+//                    previous.set(aNew);
+//                });
+
+        return head;
+    }
 }
 
 class ListNode {

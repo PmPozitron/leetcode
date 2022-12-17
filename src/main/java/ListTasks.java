@@ -426,7 +426,7 @@ public class ListTasks {
     }
 
     //  https://leetcode.com/problems/remove-nodes-from-linked-list/description/
-    // this solution was not accepted due to 'time limit exceeded' when given input with length 100_000
+    // this solution was not accepted due to 'time limit exceeded' when given input with length 100_000 {3,2,1,100_000,99_999,...,6,5,4}
     public static ListNode removeNodes(ListNode head) {
         if (head == null || head.next == null) return head;
 
@@ -479,6 +479,7 @@ public class ListTasks {
 
 //    https://leetcode.com/problems/remove-nodes-from-linked-list/solutions/2851978/java-python-3-3-codes-recursive-iterative-space-o-n-and-extra-space-o-1/
 //    Method 2: non-increasing Stack
+//    similar to ArrayTasks.nextGreaterElementViaStack
     public static ListNode removeNodesViaStack(ListNode head) {
         if (head == null || head.next == null) {
             return head;

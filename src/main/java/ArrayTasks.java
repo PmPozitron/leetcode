@@ -448,6 +448,34 @@ public class ArrayTasks {
         }
         return result;
     }
+    /*
+    Stack is used to track unprocessed elements (by that I mean el-ts, that either have not been compared with other yet,
+    or those el-s, for which there still is no 'next bigger element' found.
+    we start with empty stack, so on first run the 'for loop' instantly goes to 'stack.push' call and pushes first nums[0] into the stack.
+    on all the following iterations of 'for loop' we compare current num with the top of the stack,
+    and, if num is bigger, than we have found 'next bigger el-t' for el-t from the top of the stack,
+    so we put to resulting map an entry (the task implies nums2 having unique el-s, otherwise, assume, we would have to work with indices, but I did not check that assumption).
+    if el-t is not found, then resulting map is left unchanged.
+    both ways, we have to put current num onto the stack to allow its further processing.
+
+    in the end we just iterate over nums2 and look up for 'next bigger el-t' for all its el-ts in by calling map.getOrDefault(num, -1)
+    */
+    public int[] nextGreaterElementViaStack(int[] nums1, int[] nums2) {
+        int[] result = new int[nums1.length];
+        Stack<Integer> stack=new Stack<>();
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for(int num: nums2){
+            while(!stack.isEmpty() && num > stack.peek())
+                map.put(stack.pop(), num);
+            stack.push(num);
+        }
+
+        int i=0;
+        for(int num : nums1)
+            result[i++] = map.getOrDefault(num, -1);
+        return result;
+    }
 
     //    https://leetcode.com/problems/next-greater-element-ii/
     /*
@@ -490,7 +518,22 @@ public class ArrayTasks {
         return Arrays.stream(result).mapToInt(i -> i == null ? -1 : i.intValue()).toArray();
     }
 
-    // https://leetcode.com/problems/next-greater-element-ii/solutions/1449789/java-damn-easy-to-understand/
+
+    /*
+        https://leetcode.com/problems/next-greater-element-ii/solutions/1449789/java-damn-easy-to-understand/
+        more or less similar to ArrayTasks.nextGreaterElementViaStack,
+        but here we have to prepopulate stack (and also to put each el-t in nums once again after 'while-loop')
+        and traverse it in rear-to-front order to allow circular search
+     */
+
+    /*
+    1 3 5 2
+    i=      3           2           1           0
+    n[i]=   2           5           3           1
+    s       2 3 5 2     5           3 5         1 3 5
+    r[i]    3           -1          5           3
+    r:      -1 -1 -1 3  -1 -1 -1 3  -1 5 -1 3   3 5 -1 3
+    */
     public static int[] nextGreaterElementsViaStack(int[] nums) {
         Stack<Integer> stack=new Stack<>();
         for(int i=nums.length-1;i>=0;i--){
@@ -502,7 +545,9 @@ public class ArrayTasks {
             while(!stack.isEmpty() && stack.peek()<=nums[i]){
                 stack.pop();
             }
-            greater[i]=stack.empty()?-1:stack.peek();
+            greater[i] = stack.empty()
+                    ? -1
+                    : stack.peek();
             stack.push(nums[i]);
         }
 

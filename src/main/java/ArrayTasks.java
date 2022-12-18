@@ -1,5 +1,7 @@
 
+import java.math.BigDecimal;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +15,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,7 +27,9 @@ public class ArrayTasks {
 //        tasksForContainsNearbyDuplicate().entrySet().forEach(entry -> System.out.println(Arrays.toString(entry.getKey()) + " " + entry.getValue() + " " + containsNearbyDuplicate(entry.getKey(), entry.getValue())));
 
 //        System.out.println(Arrays.toString(nextGreaterElement(new int[]{2,4}, new int[]{1,2,3,4})));
-        System.out.println(Arrays.toString(nextGreaterElementsViaStack(new int[]{1,3,4,2})));
+//        System.out.println(Arrays.toString(nextGreaterElementsViaStack(new int[]{1,3,4,2})));
+//        System.out.println(getNumberOfCombinationsForNumIdenticalPairs(14));
+        System.out.println(numIdenticalPairs(new int[]{2, 2, 1, 5, 1, 5, 5, 2, 3, 1, 1, 5, 3, 2, 3, 3, 3, 1, 3, 3, 4, 3, 1, 3, 1, 4, 5, 5, 2, 2, 1, 3, 5, 2, 2, 4, 3, 2, 5, 3, 1, 1, 3, 3, 2, 5, 2, 1, 2, 4, 3, 4, 4, 3, 2, 4, 4, 1, 3, 3, 3, 5, 5, 5, 4, 1, 1, 2, 3, 3, 2, 5, 3, 4, 5, 3, 1, 2, 5, 4, 5, 2, 3, 3, 1, 5, 2, 4, 2, 4, 4, 3, 1, 3}));
     }
 
     public static int majorityElement(int[] nums) {
@@ -448,6 +454,7 @@ public class ArrayTasks {
         }
         return result;
     }
+
     /*
     Stack is used to track unprocessed elements (by that I mean el-ts, that either have not been compared with other yet,
     or those el-s, for which there still is no 'next bigger element' found.
@@ -462,17 +469,17 @@ public class ArrayTasks {
     */
     public int[] nextGreaterElementViaStack(int[] nums1, int[] nums2) {
         int[] result = new int[nums1.length];
-        Stack<Integer> stack=new Stack<>();
+        Stack<Integer> stack = new Stack<>();
         Map<Integer, Integer> map = new HashMap<>();
 
-        for(int num: nums2){
-            while(!stack.isEmpty() && num > stack.peek())
+        for (int num : nums2) {
+            while (!stack.isEmpty() && num > stack.peek())
                 map.put(stack.pop(), num);
             stack.push(num);
         }
 
-        int i=0;
-        for(int num : nums1)
+        int i = 0;
+        for (int num : nums1)
             result[i++] = map.getOrDefault(num, -1);
         return result;
     }
@@ -535,14 +542,14 @@ public class ArrayTasks {
     r:      -1 -1 -1 3  -1 -1 -1 3  -1 5 -1 3   3 5 -1 3
     */
     public static int[] nextGreaterElementsViaStack(int[] nums) {
-        Stack<Integer> stack=new Stack<>();
-        for(int i=nums.length-1;i>=0;i--){
+        Stack<Integer> stack = new Stack<>();
+        for (int i = nums.length - 1; i >= 0; i--) {
             stack.push(nums[i]);
         }
 
-        int greater[]=new int[nums.length];
-        for(int i=nums.length-1;i>=0;i--){
-            while(!stack.isEmpty() && stack.peek()<=nums[i]){
+        int greater[] = new int[nums.length];
+        for (int i = nums.length - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && stack.peek() <= nums[i]) {
                 stack.pop();
             }
             greater[i] = stack.empty()
@@ -552,5 +559,64 @@ public class ArrayTasks {
         }
 
         return greater;
+    }
+
+    //  https://leetcode.com/problems/number-of-good-pairs/
+    public static int numIdenticalPairs(int[] nums) {
+        HashMap<Integer, List<Integer>> map = new HashMap();
+        AtomicInteger result = new AtomicInteger();
+        for (int i = 0; i < nums.length; i++) {
+            map.merge(nums[i], new ArrayList<>(List.of(i)), (anOld, aNew) -> {
+                anOld.addAll(aNew);
+                return anOld;
+            });
+        }
+
+        map.entrySet().stream()
+                .filter(entry -> entry.getValue().size() > 1)
+                .forEach(list -> result.getAndAdd(getNumberOfCombinationsForNumIdenticalPairs(list.getValue().size())));
+
+        return result.get();
+    }
+
+    /*
+    num of combinations from n to k is n!/((n-k)! * k!)
+     */
+    private static int getNumberOfCombinationsForNumIdenticalPairs(int x) {
+        BigDecimal numerator = new BigDecimal(1);
+        BigDecimal multiplier;
+        for (int i = 1; i <= x; i++) {
+            multiplier = new BigDecimal(i);
+            numerator = numerator.multiply(multiplier);
+        }
+        BigDecimal denominator = new BigDecimal(2);
+        for (int i = 1; i <= x - 2; i++) {
+            multiplier = new BigDecimal(i);
+            denominator = denominator.multiply(multiplier);
+        }
+        return numerator.divide(denominator).intValue();
+    }
+
+    /*
+    https://leetcode.com/problems/number-of-good-pairs/solutions/1457646/java-story-based-0ms-single-pass-easy-to-understand-simple-hashmap/
+    we just need to iterate over given array and increment a counter (one counter per distinct element) when encounter same element.
+    so we do not need any combinatorics and can do well with just a map.
+    the only small trick is in how we do increment of the result.
+    when we encounter already known element we have to add current value of count for this element to result
+    (new element can make n pairs with already met n elements)
+    then we update count for this element and put that count back to the map
+    */
+    public static int numIdenticalPairsWoCombinatorics(int[] guestList) {
+        HashMap<Integer, Integer> hm = new HashMap<>();
+
+        int ans = 0;
+
+        for (int friend : guestList) {
+            int friendCount = hm.getOrDefault(friend, 0);
+            ans += friendCount;
+            hm.put(friend, friendCount + 1);
+        }
+
+        return ans;
     }
 }

@@ -29,7 +29,7 @@ public class ArrayTasks {
 //        System.out.println(Arrays.toString(nextGreaterElement(new int[]{2,4}, new int[]{1,2,3,4})));
 //        System.out.println(Arrays.toString(nextGreaterElementsViaStack(new int[]{1,3,4,2})));
 //        System.out.println(getNumberOfCombinationsForNumIdenticalPairs(14));
-        System.out.println(numIdenticalPairs(new int[]{2, 2, 1, 5, 1, 5, 5, 2, 3, 1, 1, 5, 3, 2, 3, 3, 3, 1, 3, 3, 4, 3, 1, 3, 1, 4, 5, 5, 2, 2, 1, 3, 5, 2, 2, 4, 3, 2, 5, 3, 1, 1, 3, 3, 2, 5, 2, 1, 2, 4, 3, 4, 4, 3, 2, 4, 4, 1, 3, 3, 3, 5, 5, 5, 4, 1, 1, 2, 3, 3, 2, 5, 3, 4, 5, 3, 1, 2, 5, 4, 5, 2, 3, 3, 1, 5, 2, 4, 2, 4, 4, 3, 1, 3}));
+        System.out.println(numIdenticalPairs(new int[]{1,1,1,1}));
     }
 
     public static int majorityElement(int[] nums) {
@@ -567,14 +567,14 @@ public class ArrayTasks {
         AtomicInteger result = new AtomicInteger();
         for (int i = 0; i < nums.length; i++) {
             map.merge(nums[i], new ArrayList<>(List.of(i)), (anOld, aNew) -> {
-                anOld.addAll(aNew);
+                Collections.addAll(anOld, aNew.get(0));
                 return anOld;
             });
         }
 
         map.entrySet().stream()
                 .filter(entry -> entry.getValue().size() > 1)
-                .forEach(list -> result.getAndAdd(getNumberOfCombinationsForNumIdenticalPairs(list.getValue().size())));
+                .forEach(list -> result.getAndAdd(getNumberOfCombinationsForNumIdenticalPairsWoFactorial(list.getValue().size())));
 
         return result.get();
     }
@@ -595,6 +595,20 @@ public class ArrayTasks {
             denominator = denominator.multiply(multiplier);
         }
         return numerator.divide(denominator).intValue();
+    }
+    /*
+    num of combinations from n to k is n!/((n-k)! * k!)
+    effectively, this equation leads up to multiplying last two numbers of n! sequence
+    (the n itself and the one before it) and dividing them by two
+     */
+    private static int getNumberOfCombinationsForNumIdenticalPairsWoFactorial (int x) {
+        int result = 1;
+        for (int i = 1; i <= x; i++) {
+            if (i >= x-1) {
+                result*=i;
+            }
+        }
+        return result/2;
     }
 
     /*

@@ -3,8 +3,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +12,7 @@ public class GraphTasks {
     public static void main(String[] args) throws IOException {
 //        System.out.println(validPath(3, new int[][]{{0,1},{1,2},{2,0}}, 0, 2));
 //        System.out.println(validPath(1, new int[][]{}, 0, 0));
-        System.out.println(validPathViaIterativeBfs(10, new int[][]{{0,7},{0,8},{6,1},{2,0},{0,4},{5,8},{4,7},{1,3},{3,5},{6,5}}, 7, 5));
+        System.out.println(validPathViaIterativeDfs(10, new int[][]{{0,7},{0,8},{6,1},{2,0},{0,4},{5,8},{4,7},{1,3},{3,5},{6,5}}, 7, 5));
 //        System.out.println(validPathViaBfs(2000, readHugeValidPathTaskFromFile(), 473, 901));
     }
 
@@ -44,7 +42,7 @@ public class GraphTasks {
         9|  0   0   0   0   0   0   0   0   0   0
      */
 
-    public static boolean validPathViaIterativeBfs(int n, int[][] edges, int source, int destination) {
+    public static boolean validPathViaIterativeDfs(int n, int[][] edges, int source, int destination) {
         HashMap<Integer, List<Integer>> graph = new HashMap<>();
 
         for (int i = 0; i < edges.length; i++) {

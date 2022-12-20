@@ -14,7 +14,7 @@ public class GraphTasks {
     public static void main(String[] args) throws IOException {
 //        System.out.println(validPath(3, new int[][]{{0,1},{1,2},{2,0}}, 0, 2));
 //        System.out.println(validPath(1, new int[][]{}, 0, 0));
-        System.out.println(validPathViaBfs(10, new int[][]{{0,7},{0,8},{6,1},{2,0},{0,4},{5,8},{4,7},{1,3},{3,5},{6,5}}, 7, 5));
+        System.out.println(validPathViaIterativeBfs(10, new int[][]{{0,7},{0,8},{6,1},{2,0},{0,4},{5,8},{4,7},{1,3},{3,5},{6,5}}, 7, 5));
 //        System.out.println(validPathViaBfs(2000, readHugeValidPathTaskFromFile(), 473, 901));
     }
 
@@ -44,7 +44,7 @@ public class GraphTasks {
         9|  0   0   0   0   0   0   0   0   0   0
      */
 
-    public static boolean validPathViaBfs(int n, int[][] edges, int source, int destination) {
+    public static boolean validPathViaIterativeBfs(int n, int[][] edges, int source, int destination) {
         HashMap<Integer, List<Integer>> graph = new HashMap<>();
 
         for (int i = 0; i < edges.length; i++) {
@@ -75,6 +75,9 @@ public class GraphTasks {
 
     // this approach (Warshall's algorithm from Lafore's book on algorithms in java) fails given huge input with "time exceeded"
     // fuck...
+    // update: it has not much to do with this task, I mean Warshal's algo definitely can solve such a task, but it does more than just that
+    // one should use Warshal's algo for prepopulating adjacency matrix
+    // for later using that matrix for solving such tasks (is there a path ?) in constant time instead of linear, that plain BFS/DFS provides
     public static boolean validPathViaAdjacencyMatrix(int n, int[][] edges, int source, int destination) {
 
         int[][] adjacencyMatrix = new int[n][n];
@@ -97,7 +100,6 @@ public class GraphTasks {
         }
         return adjacencyMatrix[source][destination] == 1;
     }
-
 
     private static int[][] readHugeValidPathTaskFromFile() throws IOException {
         List<String> list = Files.readAllLines(Paths.get("src/main/resources/validPathHugeTask.txt"));

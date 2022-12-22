@@ -66,20 +66,19 @@ public class GraphTasks {
         if (grid.length == 0) return 0;
 
         HashMap<Integer, Set<Integer>> land = new LinkedHashMap<>();
-        HashMap<Integer, Set<Integer>> water = new LinkedHashMap<>();
 
         int counter = 0;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                if (grid[i][j] == '0') water.put(counter++, new HashSet<>());
-                else land.put(counter++, new HashSet<>());
+                if (grid[i][j] == '1') land.put(counter++, new HashSet<>());
+                else counter++;
             }
         }
 
         if (land.size() == 0) return 0;
 
         int result = 0;
-        HashSet<Integer> visited = new LinkedHashSet<>();
+        HashSet<Integer> visited = new HashSet<>();
         ArrayDeque<Integer> stack = new ArrayDeque<>();
 
         for (Integer root : land.keySet()) {

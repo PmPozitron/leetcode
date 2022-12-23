@@ -10,14 +10,16 @@ public class SortTasks {
 
 
 //        for (int i = 0; i < 50; i++) {
-        int[] input = new Random().ints(25, 0, 10000).toArray();
+        int[] input = new Random().ints(Integer.MAX_VALUE/4, 0, 10000).toArray();
 //        System.out.println(Arrays.toString(
-            shellSort(input);
-//        );
-        for (int j = 0; j < input.length - 1; j++) {
-            if (input[j] > input[j + 1]) System.out.println(input[j] + " is not bigger than " + input[j + 1]);
+            mergeSort(input);
+//        ));
+//        for (int j = 0; j < input.length - 1; j++) {
+//            if (input[j] > input[j + 1]) System.out.println(input[j] + " is not bigger than " + input[j + 1]);
 //        }
-        }
+//        System.out.println(Arrays.toString(mergeSort(new int[]{5, 1, 1, 2, 0, 0, 9})));
+
+
     }
 
     /*
@@ -40,9 +42,9 @@ public class SortTasks {
             for (int outer = h; outer < nums.length; outer++) {
                 int num = nums[outer];
                 int inner = outer;
-                while (inner >= h && nums[inner - h] >= num){
+                while (inner >= h && nums[inner - h] >= num) {
                     nums[inner] = nums[inner - h];
-                    inner-=h;
+                    inner -= h;
                 }
                 nums[inner] = num;
             }
@@ -63,8 +65,8 @@ public class SortTasks {
         for (int i = 1; i < nums.length; i++) {
             int num = nums[i];
             int j = i;
-            while (j > 0 && nums[j-1] > num) {
-                nums[j] = nums[j-1];
+            while (j > 0 && nums[j - 1] > num) {
+                nums[j] = nums[j - 1];
                 j--;
             }
             nums[j] = num;
@@ -83,6 +85,48 @@ public class SortTasks {
         } else if (fromIndex > toIndex) {
             nums[fromIndex] = nums[fromIndex - 1];
         }
+    }
+
+    public static int[] mergeSort(int[] array) {
+        if (array == null || array.length == 0 || array.length == 1)
+            return array;
+
+        int middle = array.length / 2;
+        int[] first = new int[middle];
+        int[] second = new int[array.length - middle];
+        System.arraycopy(array, 0, first, 0, first.length);
+        System.arraycopy(array, middle, second, 0, second.length);
+        first = mergeSort(first);
+        second = mergeSort(second);
+
+        return mergeSorted(first, second);
+    }
+
+    /*
+     */
+    public static int[] mergeSorted(int[] first, int[] second) {
+        int [] result = new int[first.length + second.length];
+        int i = 0, j = 0, k = 0;
+
+        while (i < first.length && j < second.length) {
+            if (first[i] <= second[j]) {
+                result[k++] = first[i++];
+            } else {
+                result[k++] = second[j++];
+            }
+        }
+
+        if (i < first.length) {
+            for (; i < first.length; i++) {
+                result[k++] = first[i];
+            }
+        } else if (j < second.length) {
+            for (; j < second.length; j++) {
+                result[k++] = second[j];
+            }
+        }
+
+        return result;
     }
 }
 

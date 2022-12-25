@@ -30,13 +30,17 @@ public class ListTasks {
 //                .forEach(entry -> System.out.printf("input is %s, expected is %s and actual is %s\n", entry.getKey(), entry.getValue(), oddEvenList(entry.getKey())));
 
 //        System.out.println(removeElements(new ListNode(1, new ListNode(2, new ListNode(2, new ListNode(1)))), 2));
-        long start = System.nanoTime();
-        ListNode current = removeNodesViaStack(tasksAndExpectedResultsForRemoveNodes());
-        while (current != null) {
-            System.out.print(current.val + " ");
-            current = current.next;
-        }
-        System.out.println(System.nanoTime() - start);
+//        long start = System.nanoTime();
+//        ListNode current = removeNodesViaStack(tasksAndExpectedResultsForRemoveNodes());
+//        while (current != null) {
+//            System.out.print(current.val + " ");
+//            current = current.next;
+//        }
+//        System.out.println(System.nanoTime() - start);
+
+//        System.out.println(insertionSortList(new ListNode(2, new ListNode(1, new ListNode(3)))));
+//        System.out.println(insertionSortList(new ListNode(4, new ListNode(2, new ListNode(1, new ListNode(3))))));
+        System.out.println(insertionSortList(new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0)))))));
     }
 
     public static ListNode removeElements(ListNode head, int val) {
@@ -537,6 +541,51 @@ public class ListTasks {
 //                });
 
         return head;
+    }
+
+    /*  4 2 1 3
+
+     */
+    public static ListNode insertionSortList(ListNode head) {
+        if (head == null || head.next == null)
+            return head;
+
+        ListNode outerPrevious = head;
+        ListNode outerCursor = head.next;
+        ListNode result = new ListNode(head.val);
+
+
+        while (outerCursor != null) {
+            ListNode current = new ListNode(outerCursor.val);
+//            ListNode current = outerCursor;
+            outerPrevious.next = outerCursor.next;
+
+            ListNode innerPrevious = null;
+            ListNode innerCursor = result;
+            while (innerCursor != null && innerCursor.val <= current.val) {
+                innerPrevious = innerCursor;
+                innerCursor = innerCursor.next;
+            }
+
+            if (innerCursor == null) {
+                innerPrevious.next = current;
+
+            } else if (innerCursor.val > current.val) {
+                if (innerPrevious == null) {
+                    current.next = result;
+                    result = current;
+
+                } else {
+                    current.next = innerPrevious.next;
+                    innerPrevious.next = current;
+                }
+            }
+
+            outerPrevious = outerPrevious.next;
+            outerCursor = outerCursor.next;
+        }
+
+        return result;
     }
 }
 

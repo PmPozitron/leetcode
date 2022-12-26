@@ -10,10 +10,11 @@ public class SortTasks {
 
 
 //        for (int i = 0; i < 50; i++) {
-        int[] input = new Random().ints(Integer.MAX_VALUE/4, 0, 10000).toArray();
-//        System.out.println(Arrays.toString(
-            mergeSort(input);
-//        ));
+        int bound = 100;
+        int[] input = new Random().ints(bound, 0, bound).toArray();
+        System.out.println(Arrays.toString(
+            mergeSort(input)
+        ));
 //        for (int j = 0; j < input.length - 1; j++) {
 //            if (input[j] > input[j + 1]) System.out.println(input[j] + " is not bigger than " + input[j + 1]);
 //        }
@@ -92,14 +93,27 @@ public class SortTasks {
             return array;
 
         int middle = array.length / 2;
-        int[] first = new int[middle];
-        int[] second = new int[array.length - middle];
-        System.arraycopy(array, 0, first, 0, first.length);
-        System.arraycopy(array, middle, second, 0, second.length);
-        first = mergeSort(first);
-        second = mergeSort(second);
+//        int[] first = new int[middle];
+//        int[] second = new int[array.length - middle];
+//        System.arraycopy(array, 0, first, 0, first.length);
+//        System.arraycopy(array, middle, second, 0, second.length);
+//        first = mergeSort(first);
+//        second = mergeSort(second);
+//        return mergeSorted(first, second);
+        int[] copy = new int[array.length];
+        mergeSort(array, copy, 0, array.length-1);
 
-        return mergeSorted(first, second);
+        return array;
+    }
+
+    public static void mergeSort(int[] beingSorted, int[] arrayCopy, int down, int up) {
+        if (down == up) return;;
+
+        int middle = (down+up)/2;
+        mergeSort(beingSorted, arrayCopy, down, middle);
+        mergeSort(beingSorted, arrayCopy, middle+1, up);
+
+        mergeSorted(beingSorted, arrayCopy, down, middle+1, up);
     }
 
     /*
@@ -127,6 +141,34 @@ public class SortTasks {
         }
 
         return result;
+    }
+
+    public static void mergeSorted(int[] beingSorted, int[] arrayCopy, int lowPointer, int highPointer, int top) {
+        int j = 0;                       // workspace index
+        int down = lowPointer;
+        int mid = highPointer-1;
+        int n = top-down+1;       // # of items
+
+        while(lowPointer <= mid && highPointer <= top) {
+            if (beingSorted[lowPointer] < beingSorted[highPointer]) {
+                arrayCopy[j++] = beingSorted[lowPointer++];
+            } else {
+                arrayCopy[j++] = beingSorted[highPointer++];
+            }
+        }
+
+        while (lowPointer <= mid) {
+            arrayCopy[j++] = beingSorted[lowPointer++];
+        }
+
+        while (highPointer <= top) {
+            arrayCopy[j++] = beingSorted[highPointer++];
+        }
+
+        for (j=0; j<n; j++) {
+            beingSorted[down+j] = arrayCopy[j];
+        }
+
     }
 }
 

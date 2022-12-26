@@ -4,6 +4,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Stack;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,7 +41,25 @@ public class ListTasks {
 
 //        System.out.println(insertionSortList(new ListNode(2, new ListNode(1, new ListNode(3)))));
 //        System.out.println(insertionSortList(new ListNode(4, new ListNode(2, new ListNode(1, new ListNode(3))))));
-        System.out.println(insertionSortList(new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0)))))));
+//        System.out.println(insertionSortList(new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0)))))));
+
+//        int[]input = new Random().ints(5000, -10000, 10000).toArray();
+
+
+        ListNode next = null;
+        ListNode input = new ListNode(500, next);
+        ListNode head = input;
+
+        for (int i = 499; i > 0; i--) {
+            input.next = new ListNode(i);
+            input = input.next;
+        }
+//        System.out.println(insertionSortList(head));
+        ListNode cursor = insertionSortList(head);
+        while (cursor != null) {
+            System.out.print(cursor.val + " ");
+            cursor = cursor.next;
+        }
     }
 
     public static ListNode removeElements(ListNode head, int val) {
@@ -543,10 +562,63 @@ public class ListTasks {
         return head;
     }
 
-    /*  4 2 1 3
-
+    /*
+    this is updated version that sorts in-place, mutating input collection.
+    somehow it runs significantly slower with input.length=5000 (tens of seconds instead of hundreds of milliseconds for initial version)
+    therefore it is not accepted with 'time limit exceeded' error
      */
     public static ListNode insertionSortList(ListNode head) {
+        if (head == null || head.next == null)
+            return head;
+
+        ListNode outerPrevious = head;
+        ListNode outerCursor = head.next;
+//        ListNode result = new ListNode(head.val);
+        ListNode result = head;
+
+
+        while (outerCursor != null) {
+//            ListNode current = new ListNode(outerCursor.val);
+            ListNode current = outerCursor;
+            outerPrevious.next = outerCursor.next;
+
+            ListNode innerPrevious = null;
+            ListNode innerCursor = result;
+//            while (innerCursor != null && innerCursor.val <= current.val) {
+            while (innerCursor != outerPrevious.next && innerCursor.val <= current.val) {
+                innerPrevious = innerCursor;
+                innerCursor = innerCursor.next;
+            }
+
+            if (innerCursor == outerPrevious.next) {
+                current.next = outerCursor.next;
+                innerPrevious.next = current;
+
+
+            } else if (innerCursor.val > current.val) {
+                if (innerPrevious == null) {
+                    current.next = result;
+                    result = current;
+
+                } else {
+                    current.next = innerPrevious.next;
+                    innerPrevious.next = current;
+                }
+            }
+
+            outerPrevious = outerCursor;
+            outerCursor = outerCursor.next;
+        }
+
+        return result;
+    }
+
+    /*
+    this is initial version that uses extra list for storing result
+    it was accepted by leetcode
+    https://leetcode.com/problems/insertion-sort-list/submissions/865192495/
+     */
+    public static ListNode insertionSortList2(ListNode head) {
         if (head == null || head.next == null)
             return head;
 

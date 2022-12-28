@@ -46,14 +46,20 @@ public class ListTasks {
 //        int[]input = new Random().ints(5000, -10000, 10000).toArray();
 
 
+        Random rnd = new Random();
+        int size = 5000;
         ListNode next = null;
-        ListNode input = new ListNode(500, next);
+        ListNode input = new ListNode(size, next);
         ListNode head = input;
 
-        for (int i = 499; i > 0; i--) {
-            input.next = new ListNode(i);
+        for (int i = size-1; i > 0; i--) {
+            input.next = new ListNode(rnd.nextInt(size));
             input = input.next;
         }
+//
+//        ListNode head = new ListNode(4, new ListNode(2, new ListNode(1, new ListNode(3))));
+//        ListNode head = new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0, new ListNode(3))))));
+//        ListNode head = new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0)))));
 //        System.out.println(insertionSortList(head));
         ListNode cursor = insertionSortList(head);
         while (cursor != null) {
@@ -564,8 +570,7 @@ public class ListTasks {
 
     /*
     this is updated version that sorts in-place, mutating input collection.
-    somehow it runs significantly slower with input.length=5000 (tens of seconds instead of hundreds of milliseconds for initial version)
-    therefore it is not accepted with 'time limit exceeded' error
+    https://leetcode.com/problems/insertion-sort-list/submissions/866954461/
      */
     public static ListNode insertionSortList(ListNode head) {
         if (head == null || head.next == null)
@@ -573,32 +578,29 @@ public class ListTasks {
 
         ListNode outerPrevious = head;
         ListNode outerCursor = head.next;
-//        ListNode result = new ListNode(head.val);
-        ListNode result = head;
-
 
         while (outerCursor != null) {
-//            ListNode current = new ListNode(outerCursor.val);
             ListNode current = outerCursor;
-            outerPrevious.next = outerCursor.next;
+            ListNode nextForCurrent = outerCursor.next;
+
+            outerPrevious.next = nextForCurrent;
 
             ListNode innerPrevious = null;
-            ListNode innerCursor = result;
-//            while (innerCursor != null && innerCursor.val <= current.val) {
-            while (innerCursor != outerPrevious.next && innerCursor.val <= current.val) {
+            ListNode innerCursor = head;
+            while (innerCursor != current.next && innerCursor.val <= current.val) {
                 innerPrevious = innerCursor;
                 innerCursor = innerCursor.next;
             }
 
-            if (innerCursor == outerPrevious.next) {
+            if (innerCursor == current.next) {
                 current.next = outerCursor.next;
                 innerPrevious.next = current;
+                outerPrevious = current;
 
-
-            } else if (innerCursor.val > current.val) {
+            } else if (innerCursor.val >= current.val) {
                 if (innerPrevious == null) {
-                    current.next = result;
-                    result = current;
+                    current.next = head;
+                    head = current;
 
                 } else {
                     current.next = innerPrevious.next;
@@ -606,11 +608,10 @@ public class ListTasks {
                 }
             }
 
-            outerPrevious = outerCursor;
-            outerCursor = outerCursor.next;
+            outerCursor = nextForCurrent;
         }
 
-        return result;
+        return head;
     }
 
     /*

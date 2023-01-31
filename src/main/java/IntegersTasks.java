@@ -17,7 +17,8 @@ public class IntegersTasks {
 //                .toArray();
 //        System.out.println(input.length);
 //        System.out.println(totalHammingDistance(input));
-        System.out.println(isHappy(2));
+//        System.out.println(isHappy(2));
+        System.out.println(addDigits(38));
     }
 
     //  https://leetcode.com/problems/happy-number/
@@ -235,5 +236,46 @@ public class IntegersTasks {
 
     private static boolean charNotAllowed(char ch) {
         return !(isDigit(ch) || ch == '-' || ch == '+');
+    }
+
+    /*
+    https://leetcode.com/problems/power-of-two/
+     */
+    public static boolean isPowerOfTwo(int n) {
+        if (n == 0) return false;
+        if (n == 1) return true;
+
+        while (n >= 1) {
+            if (n % 2 != 0) return false;
+            n/=2;
+        }
+
+        return true;
+    }
+
+    /*
+    https://leetcode.com/problems/add-digits/
+     */
+    public static int addDigits(int num) {
+        if (num < 10) return num;
+
+        boolean toBeContinued = true;
+
+        int result = 0;
+        while (toBeContinued) {
+            while (num >= 1) {
+                result += num % 10;
+                num /= 10;
+            }
+
+            if (result < 10)
+                toBeContinued = false;
+            else {
+                num = result;
+                result = 0;
+            }
+        }
+
+        return result;
     }
 }

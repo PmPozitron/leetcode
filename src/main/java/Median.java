@@ -19,8 +19,6 @@ import java.util.Arrays;
 
 public class Median {
     public static void main(String[] args) {
-        System.out.println("Hello, world!");
-
         System.out.println(findMedian(new int[]{1,2}, new int[]{3,5}));
     }
 
@@ -29,16 +27,12 @@ public class Median {
         int i = 0;
         int j = 0;
         int k = 0;
-        for (; i< result.length; i++) {
-            if (j >= first.length)
-                break;
-            if (k >= second.length)
-                break;
 
+        while (j < first.length && k < second.length) {
             if (first[j] <= second[k])
-                result[i] = first[j++];
+                result[i++] = first[j++];
             else {
-                result[i] = second[k++];
+                result[i++] = second[k++];
             }
         }
 

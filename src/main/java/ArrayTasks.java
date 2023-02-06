@@ -29,7 +29,9 @@ public class ArrayTasks {
 //        System.out.println(Arrays.toString(nextGreaterElement(new int[]{2,4}, new int[]{1,2,3,4})));
 //        System.out.println(Arrays.toString(nextGreaterElementsViaStack(new int[]{1,3,4,2})));
 //        System.out.println(getNumberOfCombinationsForNumIdenticalPairs(14));
-        System.out.println(numIdenticalPairs(new int[]{1,1,1,1}));
+//        System.out.println(numIdenticalPairs(new int[]{1,1,1,1}));
+//        System.out.println(Arrays.toString(shuffle(new int[]{2,5,1,3,4,7}, 3)));
+        System.out.println(threeSum(new int[]{-1,0,1,2,-1,-4,-2,-3,3,0,4}));
     }
 
     public static int majorityElement(int[] nums) {
@@ -632,5 +634,69 @@ public class ArrayTasks {
         }
 
         return ans;
+    }
+
+    /*
+    https://leetcode.com/problems/shuffle-the-array/
+    Input: nums = [2,5,1,3,4,7], n = 3
+    Output: [2,3,5,4,1,7]
+    2 5 1
+    3 4 7
+    Explanation: Since x1=2, x2=5, x3=1, y1=3, y2=4, y3=7 then the answer is [2,3,5,4,1,7].
+     */
+    public static int[] shuffle(int[] input, int n) {
+        int[] result = new int[input.length];
+
+        for (int i = 0, j = 0; i < input.length/2; i++, j+=2) {
+            result[j] = input[i];
+            result[j+1] = input[i+n];
+        }
+
+        return result;
+    }
+
+    /*
+    https://leetcode.com/problems/3sum/
+    Input: nums = [-1,0,1,2,-1,-4]
+    Output: [[-1,-1,2],[-1,0,1]]
+    Explanation:
+    nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
+    nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
+    nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
+    The distinct triplets are [-1,0,1] and [-1,-1,2].
+    Notice that the order of the output and the order of the triplets does not matter.
+     */
+    public static List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> result = new LinkedList<>();
+
+        for (int i = 0; i < nums.length - 2; i++) {
+            if(i > 0 && (nums[i] == nums[i-1]))
+                continue;
+
+            int j = i + 1;
+            int k = nums.length - 1;
+
+            while (j < k) {
+                int current = nums[i] + nums[j] + nums[k];
+                if (current == 0) {
+                    result.add(List.of(nums[i], nums[j], nums[k]));
+                    while (j < k && nums[j] == nums[j+1]) j++;
+                    j++;
+
+                    while (k > j && nums[k] == nums[k-1]) k--;
+                    k--;
+
+                } else if (current < 0) {
+                    while (j < k && nums[j] == nums[j+1]) j++;
+                    j++;
+                } else {
+                    while (k > j && nums[k] == nums[k-1]) k--;
+                    k--;
+                }
+            }
+        }
+
+        return result;
     }
 }

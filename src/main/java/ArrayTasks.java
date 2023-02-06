@@ -9,6 +9,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -668,35 +669,32 @@ public class ArrayTasks {
      */
     public static List<List<Integer>> threeSum(int[] nums) {
         Arrays.sort(nums);
-        List<List<Integer>> result = new LinkedList<>();
+        Set<List<Integer>> result = new LinkedHashSet<>();
 
-        for (int i = 0; i < nums.length - 2; i++) {
-            if(i > 0 && (nums[i] == nums[i-1]))
-                continue;
+            for (int i = 0; i < nums.length - 2; i++) {
+                int j = i + 1;
+                int k = nums.length - 1;
 
-            int j = i + 1;
-            int k = nums.length - 1;
+                while (j < k) {
+                    int current = nums[i] + nums[j] + nums[k];
+                    if (current == 0) {
+                        // this three commented out lines are not needed to eliminate possible duplicates
+                        // the logic of the method exclues such duplicates by itself
+//                        List<Integer> partialResult = new LinkedList<>(Arrays.asList(nums[i], nums[j], nums[k]));
+//                        Collections.sort(partialResult);
+//                        result.add(partialResult);
+                        result.add(Arrays.asList(nums[i], nums[j], nums[k]));
+                        j++;
+                        k--;
 
-            while (j < k) {
-                int current = nums[i] + nums[j] + nums[k];
-                if (current == 0) {
-                    result.add(List.of(nums[i], nums[j], nums[k]));
-                    while (j < k && nums[j] == nums[j+1]) j++;
-                    j++;
-
-                    while (k > j && nums[k] == nums[k-1]) k--;
-                    k--;
-
-                } else if (current < 0) {
-                    while (j < k && nums[j] == nums[j+1]) j++;
-                    j++;
-                } else {
-                    while (k > j && nums[k] == nums[k-1]) k--;
-                    k--;
+                    } else if (current < 0) {
+                        j++;
+                    } else {
+                        k--;
+                    }
                 }
             }
-        }
 
-        return result;
+        return new LinkedList<>(result);
     }
 }

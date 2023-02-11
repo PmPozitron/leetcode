@@ -706,10 +706,12 @@ public class ArrayTasks {
     https://leetcode.com/problems/missing-number/
      */
     public static int missingNumber(int[] nums) {
-        Map<Integer, Boolean> map = Arrays.stream(nums).mapToObj(Integer::valueOf)
-                .collect(Collectors.toMap(Function.identity(), i -> Boolean.TRUE));
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
         for (int i = 0; i <= nums.length; i++) {
-            if (! map.containsKey(i)) {
+            if (! set.contains(i)) {
                 return i;
             }
         }

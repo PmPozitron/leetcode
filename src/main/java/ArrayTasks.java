@@ -32,7 +32,11 @@ public class ArrayTasks {
 //        System.out.println(getNumberOfCombinationsForNumIdenticalPairs(14));
 //        System.out.println(numIdenticalPairs(new int[]{1,1,1,1}));
 //        System.out.println(Arrays.toString(shuffle(new int[]{2,5,1,3,4,7}, 3)));
-        System.out.println(threeSum(new int[]{-1,0,1,2,-1,-4,-2,-3,3,0,4}));
+//        System.out.println(threeSum(new int[]{-1,0,1,2,-1,-4,-2,-3,3,0,4}));
+        Map.of(new int[]{3,0,1}, 2, new int[]{0,1}, 2, new int[]{9,6,4,2,3,5,7,0,1}, 8)
+                .entrySet().stream()
+                .forEach(entry -> System.out.printf("for input %s expected result is %d and actual is %d\n",
+                        Arrays.toString(entry.getKey()), entry.getValue(), missingNumber(entry.getKey())));
     }
 
     public static int majorityElement(int[] nums) {
@@ -696,5 +700,19 @@ public class ArrayTasks {
             }
 
         return new LinkedList<>(result);
+    }
+
+    /*
+    https://leetcode.com/problems/missing-number/
+     */
+    public static int missingNumber(int[] nums) {
+        Map<Integer, Boolean> map = Arrays.stream(nums).mapToObj(Integer::valueOf)
+                .collect(Collectors.toMap(Function.identity(), i -> Boolean.TRUE));
+        for (int i = 0; i <= nums.length; i++) {
+            if (! map.containsKey(i)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("there should have been missing element by task definition");
     }
 }

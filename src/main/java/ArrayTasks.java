@@ -33,10 +33,11 @@ public class ArrayTasks {
 //        System.out.println(numIdenticalPairs(new int[]{1,1,1,1}));
 //        System.out.println(Arrays.toString(shuffle(new int[]{2,5,1,3,4,7}, 3)));
 //        System.out.println(threeSum(new int[]{-1,0,1,2,-1,-4,-2,-3,3,0,4}));
-        Map.of(new int[]{3,0,1}, 2, new int[]{0,1}, 2, new int[]{9,6,4,2,3,5,7,0,1}, 8)
-                .entrySet().stream()
-                .forEach(entry -> System.out.printf("for input %s expected result is %d and actual is %d\n",
-                        Arrays.toString(entry.getKey()), entry.getValue(), missingNumber(entry.getKey())));
+//        Map.of(new int[]{3,0,1}, 2, new int[]{0,1}, 2, new int[]{9,6,4,2,3,5,7,0,1}, 8)
+//                .entrySet().stream()
+//                .forEach(entry -> System.out.printf("for input %s expected result is %d and actual is %d\n",
+//                        Arrays.toString(entry.getKey()), entry.getValue(), missingNumber(entry.getKey())));
+                Arrays.stream(mergeIntervalsV2(inputForMergeIntervals())).forEach(arr -> System.out.println(Arrays.toString(arr)));
     }
 
     public static int majorityElement(int[] nums) {
@@ -163,6 +164,9 @@ public class ArrayTasks {
 // Пример:
 // intervals = [[1, 6], [5, 7], [9, 10], [8, 9]];
 // mergeIntervals(Intervals); // -> [[1, 7], [8, 10]]
+// нашёл его на литкоде https://leetcode.com/problems/merge-intervals/
+// решение, кстати, оказалось неверным:
+// input: [[1,4],[2,3]], actual output: [[1,3]], expected output: [[1,4]]
     private static int[][] mergeIntervals(int[][] intervals) {
         long start = System.nanoTime();
         var sortedAsList = new LinkedList<Integer>();
@@ -204,8 +208,58 @@ public class ArrayTasks {
         return result;
     }
 
+// https://leetcode.com/problems/merge-intervals/submissions/906423292/
+//  there are other submissions with different approaches (partially stream-based)
+    public static int[][] mergeIntervalsV2(int[][] intervals) {
+        Arrays.sort(intervals, Comparator.comparingInt(arr -> arr[0]));
+        List<int[]> asList = new ArrayList<>(intervals.length);
+        for (int i = 0; i < intervals.length; i++) {
+            asList.add(intervals[i]);
+        }
+
+        ListIterator<int[]> listIterator = asList.listIterator();
+        while(listIterator.hasNext()) {
+            int[] current = listIterator.next();
+            int[] next = null;
+            if (listIterator.hasNext()) {
+                next = listIterator.next();
+            } else {
+                break;
+            }
+            if (current[1] >= next[0]) {
+                if (current[1] >= next[1]) {
+                    listIterator.remove();
+                    listIterator.previous();
+                } else {
+                    int[]aNew = new int[]{current[0], next[1]};
+                    listIterator.remove();
+                    listIterator.previous();
+                    listIterator.remove();
+                    listIterator.add(aNew);
+                    listIterator.previous();
+                }
+            } else {
+                listIterator.previous();
+            }
+        }
+
+        return asList.toArray(new int[asList.size()][2]);
+//        int[][] result = new int[asList.size()][2];
+//        int i = 0;
+//
+//        listIterator = asList.listIterator();
+//        while (listIterator.hasNext()) {
+//            result[i++] = listIterator.next();
+//        }
+//
+//        return result;
+    }
+
     public static int[][] inputForMergeIntervals() {
-        return new int[][]{{1, 6}, {5, 7}, {9, 10}, {8, 9}};
+//        return new int[][]{{1, 6}, {5, 7}, {9, 10}, {8, 9}};
+//        return new int[][]{{1, 4}, {2, 3}};
+//        return new int[][]{{1,4},{0,2},{3,5}};
+        return new int[][]{{2,3},{2,2},{3,3},{1,3},{5,7},{2,2},{4,6}};
     }
 
     // https://leetcode.com/problems/best-time-to-buy-and-sell-stock/

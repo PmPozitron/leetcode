@@ -1,13 +1,9 @@
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.Stack;
 import java.util.StringJoiner;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ListTasks {
 
@@ -46,22 +42,25 @@ public class ListTasks {
 //        int[]input = new Random().ints(5000, -10000, 10000).toArray();
 
 
-        Random rnd = new Random();
-        int size = 5000;
-        ListNode next = null;
-        ListNode input = new ListNode(size, next);
-        ListNode head = input;
-
-        for (int i = size-1; i > 0; i--) {
-            input.next = new ListNode(rnd.nextInt(size));
-            input = input.next;
-        }
+//        Random rnd = new Random();
+//        int size = 5000;
+//        ListNode next = null;
+//        ListNode input = new ListNode(size, next);
+//        ListNode head = input;
+//
+//        for (int i = size-1; i > 0; i--) {
+//            input.next = new ListNode(rnd.nextInt(size));
+//            input = input.next;
+//        }
 //
 //        ListNode head = new ListNode(4, new ListNode(2, new ListNode(1, new ListNode(3))));
-//        ListNode head = new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0, new ListNode(3))))));
+        ListNode head = new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0, new ListNode(3))))));
 //        ListNode head = new ListNode(-1, new ListNode(5, new ListNode(3, new ListNode(4, new ListNode(0)))));
+//        ListNode head = new ListNode(3, new ListNode(2, new ListNode(1)));
+//        ListNode head = new ListNode(3, new ListNode(2));
 //        System.out.println(insertionSortList(head));
-        ListNode cursor = insertionSortList(head);
+//        ListNode cursor = insertionSortList(head);
+        ListNode cursor = mergeSortLinkedList(head);
         while (cursor != null) {
             System.out.print(cursor.val + " ");
             cursor = cursor.next;
@@ -477,7 +476,7 @@ public class ListTasks {
                     head = inner;
                     outer = inner;
 
-                } else if (outer.next != null){
+                } else if (outer.next != null) {
                     outer = inner;
                     outerPrevious.next = inner;
 
@@ -494,8 +493,8 @@ public class ListTasks {
         head = reverseList(head);
         ListNode prev = head, ptr = head.next;
         int maxi = head.val;
-        for(; ptr != null; ptr = ptr.next){
-            if(ptr.val >= maxi){
+        for (; ptr != null; ptr = ptr.next) {
+            if (ptr.val >= maxi) {
                 maxi = Math.max(maxi, ptr.val);
                 prev.next = ptr;
                 prev = ptr;
@@ -506,7 +505,7 @@ public class ListTasks {
         return head;
     }
 
-//    https://leetcode.com/problems/remove-nodes-from-linked-list/solutions/2851978/java-python-3-3-codes-recursive-iterative-space-o-n-and-extra-space-o-1/
+    //    https://leetcode.com/problems/remove-nodes-from-linked-list/solutions/2851978/java-python-3-3-codes-recursive-iterative-space-o-n-and-extra-space-o-1/
 //    Method 2: non-increasing Stack
 //    similar to ArrayTasks.nextGreaterElementViaStack
     public static ListNode removeNodesViaStack(ListNode head) {
@@ -539,7 +538,7 @@ public class ListTasks {
         ListNode last = new ListNode(1);
         ListNode head = new ListNode(3, new ListNode(2, last));
 
-        for (int i = 100000; i>3; i--) {
+        for (int i = 100000; i > 3; i--) {
             last.next = new ListNode(i);
             last = last.next;
         }
@@ -659,6 +658,96 @@ public class ListTasks {
         }
 
         return result;
+    }
+
+    /*
+    https://leetcode.com/problems/sort-list/solutions/46714/java-merge-sort-solution/?orderBy=most_votes
+    took splitting algo here, merging by my own implementation
+     */
+    public static ListNode mergeSortLinkedList(ListNode head) {
+        if (head == null || head.next == null)
+            return head;
+
+        // step 1. cut the list to two halves
+        ListNode prev = null, slow = head, fast = head;
+
+        while (fast != null && fast.next != null) {
+            prev = slow;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        prev.next = null;
+
+        // step 2. sort each half
+        ListNode l1 = mergeSortLinkedList(head);
+        ListNode l2 = mergeSortLinkedList(slow);
+
+        // step 3. merge l1 and l2
+        return mergeLinkedLists(l1, l2);
+    }
+
+
+    private static ListNode mergeLinkedLists(ListNode down, ListNode up) {
+        ListNode result = new ListNode();
+        ListNode cursor = result;
+        ListNode previous = null;
+
+        while (down != null && up != null) {
+            if (down.val <= up.val) {
+                cursor.val = down.val;
+                down = down.next;
+            } else {
+                cursor.val = up.val;
+                up = up.next;
+            }
+            previous = cursor;
+            cursor.next = new ListNode();
+            cursor = cursor.next;
+        }
+
+        while (down != null) {
+            cursor.val = down.val;
+            previous = cursor;
+            cursor.next = new ListNode();
+            cursor = cursor.next;
+            down = down.next;
+        }
+
+        while (up != null) {
+            cursor.val = up.val;
+            previous = cursor;
+            cursor.next = new ListNode();
+            cursor = cursor.next;
+            up = up.next;
+        }
+
+        previous.next = null;
+        cursor = result;
+        return result;
+    }
+
+    ListNode mergeLinkedListsByLeetcoder(ListNode l1, ListNode l2) {
+        ListNode l = new ListNode(0), p = l;
+
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                p.next = l1;
+                l1 = l1.next;
+            } else {
+                p.next = l2;
+                l2 = l2.next;
+            }
+            p = p.next;
+        }
+
+        if (l1 != null)
+            p.next = l1;
+
+        if (l2 != null)
+            p.next = l2;
+
+        return l.next;
     }
 }
 

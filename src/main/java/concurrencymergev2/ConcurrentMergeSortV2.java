@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -11,38 +12,45 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ConcurrentMergeSortV2 {
-    SplitTask splitTask;
-    MergeTask mergeTask;
-    Future<?> split;
-    Future<?> merge;
-    int[] beingSorted;
-    int[] arrayCopy;
-    BlockingQueue<int[]> mergeTasks = new LinkedBlockingQueue<>();
-    ExecutorService splitter = Executors.newFixedThreadPool(8);
-    AtomicBoolean ready = new AtomicBoolean(false);
+    private static final ConcurrentMergeSortV2 INSTANCE = new ConcurrentMergeSortV2();
+    //    SplitTask splitTask;
+//    MergeTask mergeTask;
+//    Future<?> split;
+//    Future<?> merge;
+//    int[] beingSorted;
+//    int[] arrayCopy;
+//    BlockingQueue<int[]> mergeTasks = new LinkedBlockingQueue<>();
+    ExecutorService splitter = Executors.newFixedThreadPool(16);
+//    ExecutorService splitter = Executors.newCachedThreadPool();
+//    AtomicBoolean ready = new AtomicBoolean(false);
 
-    public ConcurrentMergeSortV2(int[] beingSorted) {
-        this.beingSorted = beingSorted;
-        this.arrayCopy = new int[beingSorted.length];
-        this.splitTask = new SplitTask(beingSorted, arrayCopy, mergeTasks, splitter, new int[]{0, beingSorted.length / 2, beingSorted.length});
-        this.mergeTask = new MergeTask(beingSorted, arrayCopy, mergeTasks, splitter, ready);
-        this.split = this.splitter.submit(splitTask);
-        this.merge = this.splitter.submit(mergeTask);
+    public ConcurrentMergeSortV2() {
+//        this.beingSorted = beingSorted;
+//        this.arrayCopy = new int[beingSorted.length];
+//        this.splitTask = new SplitTask(beingSorted, arrayCopy, mergeTasks, splitter, new int[]{0, beingSorted.length / 2, beingSorted.length});
+//        this.mergeTask = new MergeTask(beingSorted, arrayCopy, mergeTasks, splitter, ready);
+//        this.split = this.splitter.submit(splitTask);
+//        this.merge = this.splitter.submit(mergeTask);
     }
 
-    public static void main(String[] args) {
-        for (int i = 0; i< 10; i++) {
-            int[] input  = new Random(47).ints(100_000, 0, 100).toArray();
+    public static SortTask submitSortTask(int[] toBeSorted) {
+        return INSTANCE.new SortTask(toBeSorted);
+    }
+
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        for (int i = 0; i < 10; i++) {
+            int[] input = new Random().ints(1000, 0, 100).toArray();
             int[] copy = new int[input.length];
             System.arraycopy(input, 0, copy, 0, input.length);
             Arrays.sort(copy);
-            long start= System.nanoTime();
+            long start = System.nanoTime();
 
-            ConcurrentMergeSortV2 sortV2 = new ConcurrentMergeSortV2(input);
+            SortTask sortTask = ConcurrentMergeSortV2.submitSortTask(input);
 
-            while (!sortV2.ready.get()) {
+            while (!sortTask.isReady()) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(500);
                 } catch (InterruptedException e) {
@@ -50,20 +58,52 @@ public class ConcurrentMergeSortV2 {
                 }
             }
 
+//            System.out.println(sortV2.merge.get());
             System.out.println(System.nanoTime() - start);
-            sortV2.splitter.shutdownNow();
+//            INSTANCE.splitter.shutdownNow();
             System.out.println(Arrays.equals(input, copy));
+        }
+        INSTANCE.splitter.shutdownNow();
+    }
+
+    class SortTask {
+        int[] beingSorted;
+        int[] arrayCopy;
+        BlockingQueue<int[]> mergeTasks = new LinkedBlockingQueue<>();
+        SplitTask splitTask;
+        MergeTask mergeTask;
+        Future<?> split;
+        Future<?> merge;
+        AtomicBoolean ready = new AtomicBoolean(false);
+        AtomicReference<int[]>result = new AtomicReference<>();
+
+        public SortTask(int[] beingSorted) {
+            this.beingSorted = beingSorted;
+            this.arrayCopy = new int[beingSorted.length];
+            this.splitTask = new SplitTask(beingSorted, arrayCopy, mergeTasks, splitter, new int[]{0, beingSorted.length / 2, beingSorted.length});
+            this.mergeTask = new MergeTask(beingSorted, arrayCopy, mergeTasks, splitter, ready, result);
+            this.split = splitter.submit(splitTask);
+            this.merge = splitter.submit(mergeTask);
+        }
+
+        public boolean isReady() {
+            return ready.get();
+        }
+
+        public int[] getResult() throws InterruptedException {
+            while (!isReady()) {
+                TimeUnit.MILLISECONDS.sleep(500);
+            }
+            return beingSorted;
         }
     }
 
-    static class SplitTask implements Runnable {
+    class SplitTask implements Runnable {
         int[] beingSorted;
         int[] arrayCopy;
         BlockingQueue<int[]> mergeTasks;
         ExecutorService splitter;
         int[] cursors;
-        int down;
-        int up;
 
         public SplitTask(int[] beingSorted, int[] arrayCopy, BlockingQueue<int[]> mergeTasks, ExecutorService splitter, int[] cursors) {
             this.beingSorted = beingSorted;
@@ -85,23 +125,27 @@ public class ConcurrentMergeSortV2 {
 
         @Override
         public void run() {
-            splitter.submit(() -> split(new int[]{0, beingSorted.length-1}));
+            splitter.submit(() -> split(new int[]{0, beingSorted.length - 1}));
         }
     }
 
-    static class MergeTask implements Callable<Boolean> {
+    class MergeTask implements Callable<int[]> {
         int[] beingSorted;
         int[] arrayCopy;
         BlockingQueue<int[]> mergeTasks;
         ExecutorService splitter;
         AtomicBoolean ready;
+        AtomicReference<int[]> result;
+        volatile boolean volatileReady;
+        volatile Thread runner;
 
-        public MergeTask(int[] beingSorted, int[] arrayCopy, BlockingQueue<int[]> mergeTasks, ExecutorService splitter, AtomicBoolean ready) {
+        public MergeTask(int[] beingSorted, int[] arrayCopy, BlockingQueue<int[]> mergeTasks, ExecutorService splitter, AtomicBoolean ready, AtomicReference<int[]> result) {
             this.ready = ready;
             this.beingSorted = beingSorted;
             this.arrayCopy = arrayCopy;
             this.mergeTasks = mergeTasks;
             this.splitter = splitter;
+            this.result = result;
         }
 
         void mergeSorted(int lowPtr, int highPtr, int top) {
@@ -134,33 +178,50 @@ public class ConcurrentMergeSortV2 {
             }
 
             if (n == beingSorted.length) {
+                result.set(beingSorted);
                 ready.set(true);
+//                volatileReady = true;
+                System.out.println("in merge\t " + result.hashCode() + " " + result.get() + " " + ready.hashCode() + " " + ready.get() + " " + volatileReady);
+//                interrupt();
+
                 return;
             }
 
             mergeTasks.add(new int[]{lowPtr, top});
         }
 
-        @Override
-        public Boolean call() throws InterruptedException {
-            while (!Thread.currentThread().isInterrupted()) {
-//                synchronized (mergeTasks) {
-                    int[] first = mergeTasks.take();
-                    int[] second = mergeTasks.take();
+        public void interrupt() {
+            runner.interrupt();
+        }
 
-                    while (first[1] != second[0]-1 && second[1] != first[0]-1) {
-                        mergeTasks.add(second);
-                        second = mergeTasks.take();
-                    }
-                    int f0 = first[0], f1 = first[1], s0 = second[0], s1 = second[1];
-                    Runnable task = first[0] <= second[0]
-                            ? () -> mergeSorted(f0, s0, s1)
-                            : () -> mergeSorted(s0, f0, f1);
-                    splitter.submit(task);
-//                }
+        @Override
+        public int[] call() throws InterruptedException {
+            System.out.println("in call o\t\t " + result.hashCode() + " " + result.get() + " " + ready.hashCode() + " " + ready.get() + " " + volatileReady);
+
+            while (! ready.get()) {
+                System.out.println("in call i\t\t " + result.hashCode() + " " + result.get() + " " + ready.hashCode() + " " + ready.get() + " " + volatileReady);
+
+//            while (!Thread.currentThread().isInterrupted()) {
+                runner = Thread.currentThread();
+
+//                System.out.println("picking up first");
+                int[] first = mergeTasks.poll(500, TimeUnit.MILLISECONDS);
+//                System.out.println("picking up second");
+                int[] second = mergeTasks.poll(500, TimeUnit.MILLISECONDS);
+
+                while (!Thread.currentThread().isInterrupted() && first[1] != second[0] - 1 && second[1] != first[0] - 1) {
+                    mergeTasks.add(second);
+                    second = mergeTasks.take();
+                }
+                int f0 = first[0], f1 = first[1], s0 = second[0], s1 = second[1];
+                Runnable task = first[0] <= second[0]
+                        ? () -> mergeSorted(f0, s0, s1)
+                        : () -> mergeSorted(s0, f0, f1);
+                splitter.submit(task);
             }
 
-            return true;
+            System.out.println("exiting call()");
+            return result.get();
         }
     }
 }

@@ -771,4 +771,16 @@ public class ArrayTasks {
         }
         throw new IllegalArgumentException("there should have been missing element by task definition");
     }
+
+    public static int[] intersection(int[]one, int[]two) {
+        Set<Integer> intermediate = new HashSet<>();
+        for (int i = 0; i < one.length; i++) {
+            for (int j = 0; j < two.length; j++) {
+                if (one[i] == two[j]) {
+                    intermediate.add(one[i]);
+                }
+            }
+        }
+        return intermediate.stream().mapToInt(i -> i.intValue()).toArray();
+    }
 }

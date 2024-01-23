@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class TreeTasks {
     public static void main(String[] args) {
@@ -622,6 +623,39 @@ public class TreeTasks {
             traverse(node.right, list);
         if (node.left == null && node.right == null)
             list.add(node.val);
+    }
+
+    /*
+    https://leetcode.com/problems/binary-tree-paths/description/
+     */
+    public static List<String> binaryTreePaths(TreeNode root){
+        if (root == null) {
+            return Collections.emptyList();
+        }
+        List<String> result = new ArrayList<>();
+
+        tracePath(root, new StringBuilder(), result);
+        return result;
+    }
+
+    public static void tracePath(TreeNode cursor, StringBuilder path, List<String> result) {
+        if (cursor != null) {
+            if (path.length() != 0) {
+                path.append("->");
+            }
+            path.append(cursor.val);
+        } else {
+            return;
+        }
+        if (cursor.left == null && cursor.right == null) {
+            result.add(path.toString());
+        }
+        if (cursor.left != null) {
+            tracePath(cursor.left, new StringBuilder(path), result);
+        }
+        if (cursor.right != null) {
+            tracePath(cursor.right, new StringBuilder(path), result);
+        }
     }
 }
 

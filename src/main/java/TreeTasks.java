@@ -1,13 +1,18 @@
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class TreeTasks {
     public static void main(String[] args) {
@@ -24,7 +29,9 @@ public class TreeTasks {
 //        expectedResultsForIsBalanced().entrySet().stream()
 //                .forEach(entry -> System.out.printf("for %s expected is %b and actual is %b\n", entry.getKey(), entry.getValue(), isBalanced(entry.getKey())));
 
-        System.out.println(invertTree(new TreeNode(2, new TreeNode(1), new TreeNode(3))));
+        // System.out.println(invertTree(new TreeNode(2, new TreeNode(1), new TreeNode(3))));
+        // System.out.println(countNodes(new TreeNode(1, new TreeNode(2, new TreeNode(4), new TreeNode(5)), new TreeNode(3, new TreeNode(6), null))));
+        System.out.println(countNodes2(new TreeNode(1, new TreeNode(2, new TreeNode(4), null), new TreeNode(3))));
     }
 
     private static Map<TreeNode, List<Integer>> expectedResultsForArrayToBst() {
@@ -514,6 +521,141 @@ public class TreeTasks {
             if (current.right != null) queue.offer(current.right);
         }
         return root;
+    }
+
+    public static int countNodes(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+
+        TreeNode cursor = root;
+        int leftHeight = 0;
+        while (cursor != null) {
+            cursor = cursor.left;
+            leftHeight++;
+        }
+        cursor = root;
+        int rightHeight = 0;
+        while (cursor != null) {
+            cursor = cursor.right;
+            rightHeight++;
+        }
+
+        double result = leftHeight == rightHeight
+                ? Math.pow(2, leftHeight) - 1
+                : Math.pow(2, leftHeight) - 2;
+
+        return (int)result;
+    }
+
+    static int height(TreeNode root) {
+        if (root != null)
+            System.out.println(root.val);
+        return root == null ? -1 : 1 + height(root.left);
+    }
+    /*
+    https://leetcode.com/problems/count-complete-tree-nodes/solutions/61958/concise-java-solutions-o-log-n-2/
+    the author claims this solution to be O(log(n)^2), but given
+            1
+           2 3
+          4
+    */
+    public static int countNodes2(TreeNode root) {
+        int nodes = 0, h = height(root);
+        while (root != null) {
+            if (height(root.right) == h - 1) {
+                nodes += 1 << h;
+                root = root.right;
+            } else {
+                nodes += 1 << h-1;
+                root = root.left;
+            }
+            h--;
+        }
+        return nodes;
+    }
+
+    public static boolean leafSimilar(TreeNode one, TreeNode two) {
+        ArrayList<Integer> seqOne = new ArrayList<>();
+        LinkedBlockingQueue<TreeNode> queue = new LinkedBlockingQueue<>();
+        queue.offer(one);
+        while (! queue.isEmpty()) {
+            TreeNode cursor = queue.poll();
+            if (cursor.left != null) {
+                queue.offer(cursor.left);
+            }
+            if (cursor.right != null) {
+                queue.offer(cursor.right);
+            }
+            if (cursor.left == null && cursor.right == null) {
+                seqOne.add(cursor.val);
+            }
+        }
+        ArrayList<Integer> seqTwo = new ArrayList<>();
+        queue.offer(two);
+        while (! queue.isEmpty()) {
+            TreeNode cursor = queue.poll();
+            if (cursor.left != null) {
+                queue.offer(cursor.left);
+            }
+            if (cursor.right != null) {
+                queue.offer(cursor.right);
+            }
+            if (cursor.left == null && cursor.right == null) {
+                seqTwo.add(cursor.val);
+            }
+        }
+        return Objects.equals(seqOne, seqTwo);
+    }
+
+    public static boolean leafSimilarRecursive(TreeNode one, TreeNode two) {
+        List<Integer> seqOne = new ArrayList<>();
+        List<Integer> seqTwo = new ArrayList<>();
+        traverse(one, seqOne);
+        traverse(two, seqTwo);
+        return Objects.equals(seqOne, seqTwo);
+    }
+
+    private static void traverse(TreeNode node, List<Integer> list) {
+        if (node.left != null)
+            traverse(node.left, list);
+        if (node.right != null)
+            traverse(node.right, list);
+        if (node.left == null && node.right == null)
+            list.add(node.val);
+    }
+
+    /*
+    https://leetcode.com/problems/binary-tree-paths/description/
+     */
+    public static List<String> binaryTreePaths(TreeNode root){
+        if (root == null) {
+            return Collections.emptyList();
+        }
+        List<String> result = new ArrayList<>();
+
+        tracePath(root, new StringBuilder(), result);
+        return result;
+    }
+
+    public static void tracePath(TreeNode cursor, StringBuilder path, List<String> result) {
+        if (cursor != null) {
+            if (path.length() != 0) {
+                path.append("->");
+            }
+            path.append(cursor.val);
+        } else {
+            return;
+        }
+        if (cursor.left == null && cursor.right == null) {
+            result.add(path.toString());
+        }
+        if (cursor.left != null) {
+            tracePath(cursor.left, new StringBuilder(path), result);
+        }
+        if (cursor.right != null) {
+            tracePath(cursor.right, new StringBuilder(path), result);
+        }
     }
 }
 

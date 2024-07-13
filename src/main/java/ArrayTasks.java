@@ -9,6 +9,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -29,7 +30,14 @@ public class ArrayTasks {
 //        System.out.println(Arrays.toString(nextGreaterElement(new int[]{2,4}, new int[]{1,2,3,4})));
 //        System.out.println(Arrays.toString(nextGreaterElementsViaStack(new int[]{1,3,4,2})));
 //        System.out.println(getNumberOfCombinationsForNumIdenticalPairs(14));
-        System.out.println(numIdenticalPairs(new int[]{1,1,1,1}));
+//        System.out.println(numIdenticalPairs(new int[]{1,1,1,1}));
+//        System.out.println(Arrays.toString(shuffle(new int[]{2,5,1,3,4,7}, 3)));
+//        System.out.println(threeSum(new int[]{-1,0,1,2,-1,-4,-2,-3,3,0,4}));
+//        Map.of(new int[]{3,0,1}, 2, new int[]{0,1}, 2, new int[]{9,6,4,2,3,5,7,0,1}, 8)
+//                .entrySet().stream()
+//                .forEach(entry -> System.out.printf("for input %s expected result is %d and actual is %d\n",
+//                        Arrays.toString(entry.getKey()), entry.getValue(), missingNumber(entry.getKey())));
+                Arrays.stream(mergeIntervalsV2(inputForMergeIntervals())).forEach(arr -> System.out.println(Arrays.toString(arr)));
     }
 
     public static int majorityElement(int[] nums) {
@@ -156,6 +164,9 @@ public class ArrayTasks {
 // Пример:
 // intervals = [[1, 6], [5, 7], [9, 10], [8, 9]];
 // mergeIntervals(Intervals); // -> [[1, 7], [8, 10]]
+// нашёл его на литкоде https://leetcode.com/problems/merge-intervals/
+// решение, кстати, оказалось неверным:
+// input: [[1,4],[2,3]], actual output: [[1,3]], expected output: [[1,4]]
     private static int[][] mergeIntervals(int[][] intervals) {
         long start = System.nanoTime();
         var sortedAsList = new LinkedList<Integer>();
@@ -197,8 +208,58 @@ public class ArrayTasks {
         return result;
     }
 
+// https://leetcode.com/problems/merge-intervals/submissions/906423292/
+//  there are other submissions with different approaches (partially stream-based)
+    public static int[][] mergeIntervalsV2(int[][] intervals) {
+        Arrays.sort(intervals, Comparator.comparingInt(arr -> arr[0]));
+        List<int[]> asList = new ArrayList<>(intervals.length);
+        for (int i = 0; i < intervals.length; i++) {
+            asList.add(intervals[i]);
+        }
+
+        ListIterator<int[]> listIterator = asList.listIterator();
+        while(listIterator.hasNext()) {
+            int[] current = listIterator.next();
+            int[] next = null;
+            if (listIterator.hasNext()) {
+                next = listIterator.next();
+            } else {
+                break;
+            }
+            if (current[1] >= next[0]) {
+                if (current[1] >= next[1]) {
+                    listIterator.remove();
+                    listIterator.previous();
+                } else {
+                    int[]aNew = new int[]{current[0], next[1]};
+                    listIterator.remove();
+                    listIterator.previous();
+                    listIterator.remove();
+                    listIterator.add(aNew);
+                    listIterator.previous();
+                }
+            } else {
+                listIterator.previous();
+            }
+        }
+
+        return asList.toArray(new int[asList.size()][2]);
+//        int[][] result = new int[asList.size()][2];
+//        int i = 0;
+//
+//        listIterator = asList.listIterator();
+//        while (listIterator.hasNext()) {
+//            result[i++] = listIterator.next();
+//        }
+//
+//        return result;
+    }
+
     public static int[][] inputForMergeIntervals() {
-        return new int[][]{{1, 6}, {5, 7}, {9, 10}, {8, 9}};
+//        return new int[][]{{1, 6}, {5, 7}, {9, 10}, {8, 9}};
+//        return new int[][]{{1, 4}, {2, 3}};
+//        return new int[][]{{1,4},{0,2},{3,5}};
+        return new int[][]{{2,3},{2,2},{3,3},{1,3},{5,7},{2,2},{4,6}};
     }
 
     // https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
@@ -632,5 +693,94 @@ public class ArrayTasks {
         }
 
         return ans;
+    }
+
+    /*
+    https://leetcode.com/problems/shuffle-the-array/
+    Input: nums = [2,5,1,3,4,7], n = 3
+    Output: [2,3,5,4,1,7]
+    2 5 1
+    3 4 7
+    Explanation: Since x1=2, x2=5, x3=1, y1=3, y2=4, y3=7 then the answer is [2,3,5,4,1,7].
+     */
+    public static int[] shuffle(int[] input, int n) {
+        int[] result = new int[input.length];
+
+        for (int i = 0, j = 0; i < input.length/2; i++, j+=2) {
+            result[j] = input[i];
+            result[j+1] = input[i+n];
+        }
+
+        return result;
+    }
+
+    /*
+    https://leetcode.com/problems/3sum/
+    Input: nums = [-1,0,1,2,-1,-4]
+    Output: [[-1,-1,2],[-1,0,1]]
+    Explanation:
+    nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
+    nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
+    nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
+    The distinct triplets are [-1,0,1] and [-1,-1,2].
+    Notice that the order of the output and the order of the triplets does not matter.
+     */
+    public static List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        Set<List<Integer>> result = new LinkedHashSet<>();
+
+            for (int i = 0; i < nums.length - 2; i++) {
+                int j = i + 1;
+                int k = nums.length - 1;
+
+                while (j < k) {
+                    int current = nums[i] + nums[j] + nums[k];
+                    if (current == 0) {
+                        // this three commented out lines are not needed to eliminate possible duplicates
+                        // the logic of the method exclues such duplicates by itself
+//                        List<Integer> partialResult = new LinkedList<>(Arrays.asList(nums[i], nums[j], nums[k]));
+//                        Collections.sort(partialResult);
+//                        result.add(partialResult);
+                        result.add(Arrays.asList(nums[i], nums[j], nums[k]));
+                        j++;
+                        k--;
+
+                    } else if (current < 0) {
+                        j++;
+                    } else {
+                        k--;
+                    }
+                }
+            }
+
+        return new LinkedList<>(result);
+    }
+
+    /*
+    https://leetcode.com/problems/missing-number/
+     */
+    public static int missingNumber(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+        for (int i = 0; i <= nums.length; i++) {
+            if (! set.contains(i)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("there should have been missing element by task definition");
+    }
+
+    public static int[] intersection(int[]one, int[]two) {
+        Set<Integer> intermediate = new HashSet<>();
+        for (int i = 0; i < one.length; i++) {
+            for (int j = 0; j < two.length; j++) {
+                if (one[i] == two[j]) {
+                    intermediate.add(one[i]);
+                }
+            }
+        }
+        return intermediate.stream().mapToInt(i -> i.intValue()).toArray();
     }
 }
